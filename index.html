@@ -287,6 +287,20 @@
   }
 
   /* ── AI Nudge Cards ── */
+  .nudge-wrap {
+    position: relative;
+  }
+  .nudge-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 4px;
+    width: 48px;
+    background: linear-gradient(to right, transparent, var(--bg));
+    pointer-events: none;
+    z-index: 2;
+  }
   .nudge-scroll {
     padding: 12px 0 4px 20px;
     display: flex;
@@ -296,7 +310,7 @@
     -webkit-overflow-scrolling: touch;
   }
   .nudge-scroll::-webkit-scrollbar { display: none; }
-  .nudge-scroll::after { content: ''; min-width: 12px; display: block; }
+  .nudge-scroll::after { content: ''; min-width: 48px; display: block; flex-shrink: 0; }
 
   .nudge-card {
     flex-shrink: 0;
@@ -750,25 +764,25 @@
   /* ── Add Button ── */
   .fab {
     position: fixed;
-    bottom: 80px;
+    bottom: 88px;
     right: 20px;
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
     background: linear-gradient(135deg, var(--rose-gold), var(--crescent));
     border: none;
-    border-radius: 16px;
+    border-radius: 14px;
     color: #fff;
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(201,149,107,0.45);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99;
-    transition: transform var(--transition), box-shadow var(--transition);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow var(--transition), opacity 0.3s;
   }
-
-  .fab:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(201,149,107,0.3); }
+  .fab:active { transform: scale(0.93); box-shadow: 0 2px 8px rgba(201,149,107,0.3); }
+  .fab.hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
 
   /* ── Settings ── */
   .settings-section {
@@ -981,15 +995,18 @@
   <!-- Header -->
   <header class="app-header">
     <div class="header-brand">
-      <div class="brand-icon">☽</div>
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Lotus / flower icon -->
+          <path d="M12 2C12 2 9 6 9 10C9 11.66 9.67 13.16 10.76 14.24C9.68 13.15 8.18 12.5 6.5 12.5C3.5 12.5 1 15 1 15C1 15 3.5 17.5 6.5 17.5C8.18 17.5 9.68 16.85 10.76 15.76C9.67 16.84 9 18.34 9 20H15C15 18.34 14.33 16.84 13.24 15.76C14.32 16.85 15.82 17.5 17.5 17.5C20.5 17.5 23 15 23 15C23 15 20.5 12.5 17.5 12.5C15.82 12.5 14.32 13.15 13.24 14.24C14.33 13.16 15 11.66 15 10C15 6 12 2 12 2Z" fill="white" opacity="0.95"/>
+        </svg>
+      </div>
       <div>
         <div class="brand-text">Mommy Reminder Hub</div>
-        <div class="brand-sub">Selamat datang, Ummi 🌸</div>
       </div>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
-      <button class="icon-btn" onclick="showPage('settings')" title="Settings">⚙️</button>
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
     </div>
   </header>
 
@@ -1005,6 +1022,18 @@
           <div style="font-size:12px;color:var(--muted);margin-top:2px;">24 March 2026</div>
         </div>
         <div class="date-num">24</div>
+      </div>
+
+      <!-- Taska quick check-in -->
+      <div style="padding:10px 16px 0;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:#7cb8e822;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏡</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:13px;">Miki — Taska Di Rumah Ayu</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;" id="taskaStatusToday">Not dropped off yet today</div>
+          </div>
+          <button class="toggle" id="taskaToggleToday" onclick="toggleTaskaToday()" style="flex-shrink:0;"></button>
+        </div>
       </div>
 
       <!-- Summary row -->
@@ -1029,6 +1058,7 @@
         <span class="section-link">Refresh</span>
       </div>
 
+      <div class="nudge-wrap">
       <div class="nudge-scroll">
         <div class="nudge-card">
           <div class="nudge-emoji">🎂</div>
@@ -1037,7 +1067,7 @@
         </div>
         <div class="nudge-card" style="background:linear-gradient(135deg,#5a7cb8,#7c9ee8);">
           <div class="nudge-emoji">💊</div>
-          <div class="nudge-text">Have you bought your supplements this month? Don't forget your self-care routine — Ummi kena jaga diri dulu!</div>
+          <div class="nudge-text">Have you bought your supplements this month? Don't forget your self-care routine — Mommy kena jaga diri dulu!</div>
           <div class="nudge-tag">Self-Care 🌸</div>
         </div>
         <div class="nudge-card" style="background:linear-gradient(135deg,#5a8a5a,#7cb87c);">
@@ -1055,6 +1085,12 @@
           <div class="nudge-text">When did you last have a proper me-time? Plan something small this weekend — gym, spa, or even just a quiet coffee alone ☕</div>
           <div class="nudge-tag">Self-Care 🌸</div>
         </div>
+        <div class="nudge-card" style="background:linear-gradient(135deg,#4a7a6a,#6ab8a0);">
+          <div class="nudge-emoji">🕌</div>
+          <div class="nudge-text">Hari Raya Aidilfitri is in ~6 days! Have you bought baju raya, kuih, and prepared lemang for breakfast? Don't forget duit raya!</div>
+          <div class="nudge-tag">Holiday 🌙</div>
+        </div>
+      </div>
       </div>
 
       <!-- Today's reminders -->
@@ -1748,6 +1784,16 @@
             </div>
           </div>
 
+          <!-- Taska quick toggle -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:#7cb8e822;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏡</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">Taska Di Rumah Ayu</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="taskaStatus">Tap to mark Miki dropped off today</div>
+            </div>
+            <button class="toggle" id="taskaToggle" onclick="toggleTaska()" style="flex-shrink:0;"></button>
+          </div>
+
           <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Vaccinations</div>
 
           <div class="vax-item">
@@ -1873,8 +1919,8 @@
       <div class="profile-card">
         <div class="profile-avatar">👩‍💻</div>
         <div>
-          <div class="profile-name">Ummi</div>
-          <div class="profile-title">L3 Cloud Admin • VMware + Hyper-V • KL, Malaysia</div>
+          <div class="profile-name">Mommy</div>
+          <div class="profile-title">KL, Malaysia 🇲🇾</div>
         </div>
       </div>
 
@@ -1971,7 +2017,7 @@
 
         <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">
           Mommy Reminder Hub v1.0 (Phase 1 — UI Preview)<br>
-          Built with ☽ &amp; 🌸 for a super Ummi in KL
+          Built with 🌸 &amp; ☽ for a super Mommy in KL
         </div>
 
       </div>
@@ -2005,6 +2051,10 @@
       <span class="nav-icon">👨‍👩‍👧</span>
       <span>Family</span>
     </button>
+    <button class="nav-item" id="nav-settings" onclick="showPage('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span>Settings</span>
+    </button>
   </nav>
 
 </div>
@@ -2019,6 +2069,8 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   document.getElementById('nav-' + name)?.classList.add('active');
+  // scroll main back to top on page switch
+  document.querySelector('.main-content').scrollTop = 0;
 }
 
 // ── Theme Toggle ──
@@ -2028,10 +2080,21 @@ function toggleTheme() {
   document.body.dataset.theme = isDark ? 'dark' : 'light';
   document.getElementById('themeToggle').textContent = isDark ? '🌙' : '☀️';
   const settingsToggle = document.getElementById('themeToggleSettings');
-  if (settingsToggle) {
-    settingsToggle.classList.toggle('on', isDark);
-  }
+  if (settingsToggle) settingsToggle.classList.toggle('on', isDark);
 }
+
+// ── FAB hide-on-scroll ──
+let lastScroll = 0;
+document.querySelector('.main-content').addEventListener('scroll', function() {
+  const fab = document.querySelector('.fab');
+  const current = this.scrollTop;
+  if (current > lastScroll + 10) {
+    fab.classList.add('hidden');
+  } else if (current < lastScroll - 10) {
+    fab.classList.remove('hidden');
+  }
+  lastScroll = current;
+}, { passive: true });
 
 // ── Finance Group Toggle ──
 function toggleGroup(header) {
@@ -2055,8 +2118,37 @@ function toggleDone(card) {
 function filterCat(btn, cat) {
   document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
-  // In Phase 1 just show toast — full filtering in Phase 2
   if (cat !== 'all') showToast('Filtering: ' + cat);
+}
+
+// ── Taska Toggles ──
+let taskaOn = false;
+function toggleTaskaToday() {
+  taskaOn = !taskaOn;
+  const tog = document.getElementById('taskaToggleToday');
+  const status = document.getElementById('taskaStatusToday');
+  if (tog) tog.classList.toggle('on', taskaOn);
+  if (status) status.textContent = taskaOn ? '✓ Dropped off at Taska today' : 'Not dropped off yet today';
+  // sync family page toggle
+  const tog2 = document.getElementById('taskaToggle');
+  const status2 = document.getElementById('taskaStatus');
+  if (tog2) tog2.classList.toggle('on', taskaOn);
+  if (status2) status2.textContent = taskaOn ? '✓ Miki dropped off today' : 'Tap to mark Miki dropped off today';
+  showToast(taskaOn ? 'Miki — dropped off ✓' : 'Miki — marked not dropped off');
+}
+
+function toggleTaska() {
+  taskaOn = !taskaOn;
+  const tog = document.getElementById('taskaToggle');
+  const status = document.getElementById('taskaStatus');
+  if (tog) tog.classList.toggle('on', taskaOn);
+  if (status) status.textContent = taskaOn ? '✓ Miki dropped off today' : 'Tap to mark Miki dropped off today';
+  // sync today page toggle
+  const tog2 = document.getElementById('taskaToggleToday');
+  const status2 = document.getElementById('taskaStatusToday');
+  if (tog2) tog2.classList.toggle('on', taskaOn);
+  if (status2) status2.textContent = taskaOn ? '✓ Dropped off at Taska today' : 'Not dropped off yet today';
+  showToast(taskaOn ? 'Miki — dropped off ✓' : 'Miki — marked not dropped off');
 }
 
 // ── Toast ──
@@ -2102,7 +2194,6 @@ function renderCal() {
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
 
-  // Day headers
   ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
     const el = document.createElement('div');
     el.className = 'cal-day-name';
@@ -2115,7 +2206,6 @@ function renderCal() {
   const prevDays = new Date(calYear, calMonth, 0).getDate();
   const today = new Date();
 
-  // Prev month
   for (let i = firstDay - 1; i >= 0; i--) {
     const el = document.createElement('div');
     el.className = 'cal-day other-month';
@@ -2123,22 +2213,18 @@ function renderCal() {
     grid.appendChild(el);
   }
 
-  // Current month
   for (let d = 1; d <= daysInMonth; d++) {
     const el = document.createElement('div');
     el.className = 'cal-day';
     el.textContent = d;
-
     const key = `${calYear}-${calMonth+1}-${d}`;
     if (PH[key]) el.classList.add('has-event');
     if (calYear === today.getFullYear() && calMonth === today.getMonth() && d === today.getDate()) {
       el.classList.add('today');
     }
-    // Public holiday red
     if (PH[key] && (key.includes('-3-30') || key.includes('-3-31') || key.includes('-8-31') || key.includes('-5-1') || key.includes('-9-16'))) {
       el.classList.add('ph');
     }
-
     grid.appendChild(el);
   }
 }
