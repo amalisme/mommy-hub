@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mommy Reminder Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Rose gold & blush palette */
+    --rose-gold: #c9956b;
+    --rose-gold-light: #e8b99a;
+    --rose-gold-dark: #a0714f;
+    --blush: #f7ddd6;
+    --blush-deep: #f0c4b8;
+    --blush-pale: #fdf4f1;
+    --cream: #fef9f6;
+    --crescent: #d4a96a;
+
+    /* Dark mode surfaces */
+    --dark-bg: #1a1210;
+    --dark-surface: #241a17;
+    --dark-card: #2e2118;
+    --dark-border: #3d2e25;
+    --dark-text: #f5e8df;
+    --dark-muted: #a08070;
+
+    /* Light mode surfaces */
+    --light-bg: #fdf6f2;
+    --light-surface: #ffffff;
+    --light-card: #ffffff;
+    --light-border: #f0d8cc;
+    --light-text: #2a1810;
+    --light-muted: #9a7060;
+
+    /* Category colors */
+    --cat-grocery: #e8a87c;
+    --cat-school: #7cb8e8;
+    --cat-birthday: #e87cb8;
+    --cat-holiday: #a8e87c;
+    --cat-pubhol: #e8d47c;
+    --cat-work: #7c9ee8;
+    --cat-health: #e87c7c;
+    --cat-finance: #7ce8c4;
+    --cat-selfcare: #c47ce8;
+    --cat-home: #e8b87c;
+    --cat-meals: #f0a060;
+
+    /* Active theme (default dark) */
+    --bg: var(--dark-bg);
+    --surface: var(--dark-surface);
+    --card: var(--dark-card);
+    --border: var(--dark-border);
+    --text: var(--dark-text);
+    --muted: var(--dark-muted);
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Nunito', 'Segoe UI', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.18);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.12);
+    --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  [data-theme="light"] {
+    --bg: var(--light-bg);
+    --surface: var(--light-surface);
+    --card: var(--light-card);
+    --border: var(--light-border);
+    --text: var(--light-text);
+    --muted: var(--light-muted);
+    --shadow: 0 4px 24px rgba(180,100,60,0.10);
+    --shadow-sm: 0 2px 8px rgba(180,100,60,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  /* ── App Shell ── */
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: var(--bg);
+  }
+
+  /* ── Top Header ── */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, var(--rose-gold) 0%, var(--crescent) 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(201,149,107,0.35);
+  }
+
+  .brand-text {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--rose-gold);
+    letter-spacing: -0.2px;
+  }
+
+  .brand-sub {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: -2px;
+    font-family: var(--font-body);
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  .icon-btn:active { background: var(--border); }
+  .icon-btn.active { color: var(--rose-gold); }
+
+  /* ── Main Content ── */
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px;
+    scroll-behavior: smooth;
+  }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: stretch;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color var(--transition);
+    position: relative;
+  }
+
+  .nav-item .nav-icon { font-size: 20px; line-height: 1; }
+
+  .nav-item.active { color: var(--rose-gold); }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: var(--rose-gold);
+    border-radius: 0 0 3px 3px;
+  }
+
+  /* ── Pages ── */
+  .page { display: none; animation: fadeUp 0.28s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section heading ── */
+  .section-head {
+    padding: 20px 20px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-link {
+    font-size: 12px;
+    color: var(--rose-gold);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ── Date strip ── */
+  .date-strip {
+    padding: 16px 20px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .date-big {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .date-num {
+    font-family: var(--font-display);
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--rose-gold);
+    line-height: 1;
+  }
+
+  /* ── AI Nudge Cards ── */
+  .nudge-scroll {
+    padding: 12px 0 4px 20px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nudge-scroll::-webkit-scrollbar { display: none; }
+  .nudge-scroll::after { content: ''; min-width: 12px; display: block; }
+
+  .nudge-card {
+    flex-shrink: 0;
+    width: 240px;
+    background: linear-gradient(135deg, var(--rose-gold-dark) 0%, var(--rose-gold) 60%, var(--crescent) 100%);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(201,149,107,0.3);
+  }
+
+  .nudge-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+
+  .nudge-emoji { font-size: 22px; margin-bottom: 6px; }
+  .nudge-text { font-size: 13px; line-height: 1.45; font-weight: 500; }
+  .nudge-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 10px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Reminder Card ── */
+  .reminder-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+
+  .reminder-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .reminder-card:active { box-shadow: var(--shadow-sm); }
+
+  .reminder-card.done { opacity: 0.5; }
+  .reminder-card.done .reminder-title { text-decoration: line-through; }
+
+  .reminder-card.urgent {
+    border-left: 3px solid #e87c7c;
+  }
+  .reminder-card.soon {
+    border-left: 3px solid var(--crescent);
+  }
+
+  .cat-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .reminder-body { flex: 1; min-width: 0; }
+  .reminder-title { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .reminder-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .reminder-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  .badge-today { background: #e87c7c22; color: #e87c7c; }
+  .badge-soon { background: var(--crescent); color: #fff; opacity: 0.9; }
+  .badge-week { background: var(--blush-deep); color: var(--rose-gold-dark); }
+  .badge-done { background: #7ce87c22; color: #5ab85a; }
+
+  /* ── Checkbox ── */
+  .check-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 7px;
+    transition: border-color var(--transition), background var(--transition);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .check-circle.checked { border-color: var(--rose-gold); background: var(--rose-gold); color: #fff; }
+
+  /* ── Category chips ── */
+  .cat-chips {
+    padding: 10px 20px 4px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cat-chips::-webkit-scrollbar { display: none; }
+
+  .cat-chip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .cat-chip.active {
+    background: var(--rose-gold);
+    border-color: var(--rose-gold);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(201,149,107,0.3);
+  }
+
+  /* ── Finance Cards ── */
+  .finance-section { padding: 0 16px; }
+
+  .finance-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .finance-group-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .fgroup-icon { font-size: 18px; }
+  .fgroup-title { font-weight: 700; font-size: 14px; flex: 1; }
+  .fgroup-count { font-size: 11px; color: var(--muted); }
+  .fgroup-chevron { font-size: 14px; color: var(--muted); transition: transform var(--transition); }
+  .finance-group.open .fgroup-chevron { transform: rotate(180deg); }
+
+  .finance-items { display: none; }
+  .finance-group.open .finance-items { display: block; }
+
+  .finance-item {
+    padding: 10px 16px 10px 46px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .finance-item-name { flex: 1; font-size: 13px; font-weight: 500; }
+  .finance-item-due { font-size: 11px; color: var(--muted); }
+  .finance-status {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .status-due { background: #e87c7c22; color: #e87c7c; }
+  .status-ok { background: #7ce87c22; color: #5ab85a; }
+  .status-soon { background: var(--crescent); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 20px; opacity: 0.85; }
+  .status-pending { background: var(--blush-deep); color: var(--rose-gold-dark); }
+
+  /* ── Summary Row ── */
+  .summary-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 14px 16px 4px;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 10px;
+    text-align: center;
+  }
+
+  .summary-num {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--rose-gold);
+    line-height: 1;
+  }
+
+  .summary-label {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Calendar View ── */
+  .calendar-wrap { padding: 0 16px; }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0 12px;
+  }
+
+  .cal-month {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .cal-nav {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .cal-day-name {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    padding: 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition);
+    gap: 2px;
+  }
+
+  .cal-day:active { background: var(--border); }
+  .cal-day.other-month { color: var(--border); }
+  .cal-day.today {
+    background: var(--rose-gold);
+    color: #fff;
+    font-weight: 700;
+  }
+  .cal-day.has-event::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--crescent);
+    position: absolute;
+    bottom: 3px;
+  }
+  .cal-day.today.has-event::after { background: #fff; }
+
+  .cal-day.ph { color: #e87c7c; font-weight: 700; }
+  .cal-day.holiday { background: #e8d47c18; }
+
+  /* ── School Calendar ── */
+  .school-term {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+
+  .term-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .term-badge {
+    background: var(--rose-gold);
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .term-name { font-weight: 700; font-size: 14px; }
+  .term-dates { font-size: 12px; color: var(--muted); }
+
+  .holiday-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--blush);
+    color: var(--rose-gold-dark);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px 3px 2px 0;
+  }
+
+  [data-theme="light"] .holiday-pill {
+    background: var(--blush-deep);
+  }
+
+  /* ── Kids Section ── */
+  .kid-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .kid-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .kid-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--blush-deep), var(--rose-gold-light));
+    flex-shrink: 0;
+  }
+
+  .kid-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+  .kid-age { font-size: 12px; color: var(--muted); }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .progress-label { font-size: 12px; font-weight: 600; flex: 1; }
+  .progress-bar-wrap { flex: 2; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 3px; background: var(--rose-gold); transition: width 0.5s ease; }
+  .progress-pct { font-size: 11px; color: var(--muted); width: 32px; text-align: right; }
+
+  .vax-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .vax-item:last-child { border-bottom: none; }
+
+  .vax-check { font-size: 15px; flex-shrink: 0; }
+  .vax-name { font-size: 13px; flex: 1; }
+  .vax-date { font-size: 11px; color: var(--muted); }
+
+  /* ── Meal Planner ── */
+  .meal-day {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+
+  .meal-day-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .meal-day-name { font-weight: 700; font-size: 14px; }
+  .meal-day-date { font-size: 11px; color: var(--muted); }
+
+  .meal-slot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+  }
+
+  .meal-slot-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    width: 52px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+  }
+
+  .meal-slot-value { font-size: 13px; color: var(--text); }
+  .meal-slot-empty { font-size: 13px; color: var(--border); font-style: italic; }
+
+  /* ── Add Button ── */
+  .fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--rose-gold), var(--crescent));
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(201,149,107,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+
+  .fab:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(201,149,107,0.3); }
+
+  /* ── Settings ── */
+  .settings-section {
+    padding: 0 16px;
+    margin-bottom: 16px;
+  }
+
+  .settings-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row:active { background: var(--border); }
+
+  .settings-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+  .settings-label { flex: 1; font-size: 14px; font-weight: 500; }
+  .settings-value { font-size: 12px; color: var(--muted); }
+  .settings-arrow { font-size: 14px; color: var(--muted); }
+
+  /* ── Toggle ── */
+  .toggle {
+    width: 44px;
+    height: 26px;
+    background: var(--border);
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition);
+    flex-shrink: 0;
+    border: none;
+  }
+
+  .toggle.on { background: var(--rose-gold); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--transition);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .toggle.on::after { transform: translateX(18px); }
+
+  /* ── API key input ── */
+  .settings-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    margin-top: 8px;
+    transition: border-color var(--transition);
+  }
+
+  .settings-input:focus { border-color: var(--rose-gold); }
+
+  /* ── Profile card ── */
+  .profile-card {
+    margin: 16px;
+    background: linear-gradient(135deg, var(--rose-gold-dark) 0%, var(--rose-gold) 60%, var(--crescent) 100%);
+    border-radius: var(--radius);
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .profile-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+  .profile-title { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+  .empty-state .es-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Scrollable reminder list with category filter ── */
+  .sticky-cats {
+    position: sticky;
+    top: 57px;
+    background: var(--bg);
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+
+  /* ── Upcoming count badge ── */
+  .nav-badge {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 18px);
+    background: #e87c7c;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    min-width: 16px;
+    text-align: center;
+  }
+
+  /* ── Public Holiday Chip ── */
+  .ph-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+  }
+  .ph-chip-date { font-size: 12px; font-weight: 700; color: var(--rose-gold); width: 80px; flex-shrink: 0; }
+  .ph-chip-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .ph-chip-state { font-size: 10px; color: var(--muted); background: var(--border); padding: 2px 7px; border-radius: 10px; flex-shrink: 0; }
+
+  /* ── Work card ── */
+  .work-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .work-icon { font-size: 22px; flex-shrink: 0; }
+  .work-body { flex: 1; }
+  .work-title { font-weight: 600; font-size: 14px; }
+  .work-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .work-status { font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
+  /* responsive tweaks */
+  @media (max-width: 380px) {
+    .brand-text { font-size: 15px; }
+    .date-num { font-size: 32px; }
+    .summary-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- App Shell -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-icon">☽</div>
+      <div>
+        <div class="brand-text">Mommy Reminder Hub</div>
+        <div class="brand-sub">Selamat datang, Ummi 🌸</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <button class="icon-btn" onclick="showPage('settings')" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- ═══════════════════════════ TODAY ═══════════════════════════ -->
+    <section class="page active" id="page-today">
+
+      <div class="date-strip">
+        <div>
+          <div class="date-big">Tuesday — Kuala Lumpur</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">24 March 2026</div>
+        </div>
+        <div class="date-num">24</div>
+      </div>
+
+      <!-- Summary row -->
+      <div class="summary-row">
+        <div class="summary-card">
+          <div class="summary-num" style="color:#e87c7c;">3</div>
+          <div class="summary-label">Urgent</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num">8</div>
+          <div class="summary-label">This Week</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color:var(--crescent);">2</div>
+          <div class="summary-label">Birthdays</div>
+        </div>
+      </div>
+
+      <!-- AI Nudges -->
+      <div class="section-head">
+        <div class="section-title">✨ AI Nudges</div>
+        <span class="section-link">Refresh</span>
+      </div>
+
+      <div class="nudge-scroll">
+        <div class="nudge-card">
+          <div class="nudge-emoji">🎂</div>
+          <div class="nudge-text">Lisa's birthday is in 18 days! Time to start planning her 5th birthday party. Where's her favourite place — Animax Kidz?</div>
+          <div class="nudge-tag">Birthday 🎉</div>
+        </div>
+        <div class="nudge-card" style="background:linear-gradient(135deg,#5a7cb8,#7c9ee8);">
+          <div class="nudge-emoji">💊</div>
+          <div class="nudge-text">Have you bought your supplements this month? Don't forget your self-care routine — Ummi kena jaga diri dulu!</div>
+          <div class="nudge-tag">Self-Care 🌸</div>
+        </div>
+        <div class="nudge-card" style="background:linear-gradient(135deg,#5a8a5a,#7cb87c);">
+          <div class="nudge-emoji">📝</div>
+          <div class="nudge-text">SNOW Knowledge Base contribution deadline is end of March. Have you drafted your KB article this month?</div>
+          <div class="nudge-tag">Work 💻</div>
+        </div>
+        <div class="nudge-card" style="background:linear-gradient(135deg,#8a5a5a,#c47c7c);">
+          <div class="nudge-emoji">💰</div>
+          <div class="nudge-text">Mortgage Mawar is due before the 4th. Only 11 days left — make sure funds are ready in the account.</div>
+          <div class="nudge-tag">Finance 💳</div>
+        </div>
+        <div class="nudge-card" style="background:linear-gradient(135deg,#7a5a8a,#c47ce8);">
+          <div class="nudge-emoji">💅</div>
+          <div class="nudge-text">When did you last have a proper me-time? Plan something small this weekend — gym, spa, or even just a quiet coffee alone ☕</div>
+          <div class="nudge-tag">Self-Care 🌸</div>
+        </div>
+      </div>
+
+      <!-- Today's reminders -->
+      <div class="section-head">
+        <div class="section-title">Today's Reminders</div>
+        <span class="section-link">All →</span>
+      </div>
+
+      <div class="reminder-list">
+
+        <div class="reminder-card urgent" onclick="toggleDone(this)">
+          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e87c7c22;color:#e87c7c;">💰</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Mortgage Plaza KJ — Auto Deduct</div>
+            <div class="reminder-sub">1st of month • Auto deducted today</div>
+          </div>
+          <div class="reminder-badge badge-today">Today</div>
+        </div>
+
+        <div class="reminder-card urgent" onclick="toggleDone(this)">
+          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#7ce8c422;color:#7ce8c4;">💻</div>
+          <div class="reminder-body">
+            <div class="reminder-title">SNOW Knowledge Base Contribution</div>
+            <div class="reminder-sub">Monthly KPI • Due end of March</div>
+          </div>
+          <div class="reminder-badge badge-today">This Month</div>
+        </div>
+
+        <div class="reminder-card soon" onclick="toggleDone(this)">
+          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e8d47c22;color:#e8d47c;">🎂</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Syabil's Birthday</div>
+            <div class="reminder-sub">8 March — passed! Did you celebrate? 🎉</div>
+          </div>
+          <div class="reminder-badge badge-week">Passed</div>
+        </div>
+
+        <div class="reminder-card" onclick="toggleDone(this)">
+          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#c47ce822;color:#c47ce8;">🌸</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Gym Session</div>
+            <div class="reminder-sub">Membership active • Schedule your next visit</div>
+          </div>
+          <div class="reminder-badge badge-week">Self-Care</div>
+        </div>
+
+        <div class="reminder-card" onclick="toggleDone(this)">
+          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#7cb8e822;color:#7cb8e8;">🏫</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Lisa — SJK(C) Sentul Enrolment Prep</div>
+            <div class="reminder-sub">January 2027 intake • ~9 months to go</div>
+          </div>
+          <div class="reminder-badge badge-week">School</div>
+        </div>
+
+      </div>
+
+      <!-- Upcoming this week -->
+      <div class="section-head" style="padding-top:16px;">
+        <div class="section-title">Coming Up Soon</div>
+      </div>
+
+      <div class="reminder-list" style="padding-bottom:8px;">
+
+        <div class="reminder-card">
+          <div class="cat-dot" style="background:#e87c7c22;color:#e87c7c;">💳</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Mortgage Mawar — Pay Before 4th</div>
+            <div class="reminder-sub">Finance • 11 days left</div>
+          </div>
+          <div class="reminder-badge" style="background:var(--crescent);color:#fff;">11d</div>
+        </div>
+
+        <div class="reminder-card">
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Lisa's Birthday 🎂</div>
+            <div class="reminder-sub">12 March → 12 April is next year</div>
+          </div>
+          <div class="reminder-badge badge-week">April</div>
+        </div>
+
+        <div class="reminder-card">
+          <div class="cat-dot" style="background:#7ce87c22;color:#5ab85a;">🕌</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Eid al-Fitr (Hari Raya Aidilfitri)</div>
+            <div class="reminder-sub">~30 March 2025 • Check lemang, kuih prep</div>
+          </div>
+          <div class="reminder-badge badge-soon">~6d</div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════ REMINDERS ═══════════════════════════ -->
+    <section class="page" id="page-reminders">
+
+      <div class="section-head">
+        <div class="section-title">All Reminders</div>
+        <span class="section-link" onclick="showAddModal()">+ Add</span>
+      </div>
+
+      <!-- Category filter chips -->
+      <div class="sticky-cats">
+        <div class="cat-chips">
+          <button class="cat-chip active" onclick="filterCat(this,'all')">All</button>
+          <button class="cat-chip" onclick="filterCat(this,'work')">💻 Work</button>
+          <button class="cat-chip" onclick="filterCat(this,'finance')">💰 Finance</button>
+          <button class="cat-chip" onclick="filterCat(this,'school')">🏫 School</button>
+          <button class="cat-chip" onclick="filterCat(this,'birthday')">🎂 Birthday</button>
+          <button class="cat-chip" onclick="filterCat(this,'health')">💊 Health</button>
+          <button class="cat-chip" onclick="filterCat(this,'holiday')">🕌 Holiday</button>
+          <button class="cat-chip" onclick="filterCat(this,'pubhol')">🇲🇾 PH</button>
+          <button class="cat-chip" onclick="filterCat(this,'grocery')">🛒 Grocery</button>
+          <button class="cat-chip" onclick="filterCat(this,'home')">🏠 Home</button>
+          <button class="cat-chip" onclick="filterCat(this,'selfcare')">🌸 Self-Care</button>
+          <button class="cat-chip" onclick="filterCat(this,'meals')">🍽️ Meals</button>
+        </div>
+      </div>
+
+      <div style="height:10px;"></div>
+
+      <!-- Work reminders -->
+      <div style="padding: 0 16px 6px; font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Work</div>
+      <div class="reminder-list">
+        <div class="reminder-card" data-cat="work">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#7c9ee822;color:#7c9ee8;">💻</div>
+          <div class="reminder-body">
+            <div class="reminder-title">SNOW Knowledge Base Contribution</div>
+            <div class="reminder-sub">Monthly KPI • Due end of March</div>
+          </div>
+          <div class="reminder-badge badge-today">KPI</div>
+        </div>
+        <div class="reminder-card" data-cat="work">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#7c9ee822;color:#7c9ee8;">🔧</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Oracle Linux 8 Security Patching</div>
+            <div class="reminder-sub">Monthly • Date TBD — add manually when scheduled</div>
+          </div>
+          <div class="reminder-badge badge-week">Manual</div>
+        </div>
+        <div class="reminder-card" data-cat="work">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#7c9ee822;color:#7c9ee8;">📋</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Audit Prep Review</div>
+            <div class="reminder-sub">Add date manually when scheduled</div>
+          </div>
+          <div class="reminder-badge badge-week">Manual</div>
+        </div>
+      </div>
+
+      <!-- Birthday reminders -->
+      <div style="padding: 14px 16px 6px; font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Birthdays</div>
+      <div class="reminder-list">
+        <div class="reminder-card done" data-cat="birthday">
+          <div class="check-circle checked" onclick="toggleCheck(this)">✓</div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Thomas's Birthday 🎉</div>
+            <div class="reminder-sub">12 February • Arrange dinner or buy cake</div>
+          </div>
+          <div class="reminder-badge badge-done">Done</div>
+        </div>
+        <div class="reminder-card done" data-cat="birthday">
+          <div class="check-circle checked" onclick="toggleCheck(this)">✓</div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Syabil's Birthday 🎉</div>
+            <div class="reminder-sub">8 March • Did you celebrate?</div>
+          </div>
+          <div class="reminder-badge badge-done">Passed</div>
+        </div>
+        <div class="reminder-card" data-cat="birthday">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Lisa's Birthday 🎂</div>
+            <div class="reminder-sub">12 March — turning 5! Plan party 🎠</div>
+          </div>
+          <div class="reminder-badge badge-week">19d</div>
+        </div>
+        <div class="reminder-card" data-cat="birthday">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Miki's Birthday 🎈</div>
+            <div class="reminder-sub">2 May • Turning 4 — plan something fun!</div>
+          </div>
+          <div class="reminder-badge badge-week">39d</div>
+        </div>
+      </div>
+
+      <!-- Health & Home reminders -->
+      <div style="padding: 14px 16px 6px; font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Home Maintenance</div>
+      <div class="reminder-list">
+        <div class="reminder-card" data-cat="home">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e8b87c22;color:#e8b87c;">❄️</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Aircond Service</div>
+            <div class="reminder-sub">Every 3–6 months • Add date manually</div>
+          </div>
+          <div class="reminder-badge badge-week">Manual</div>
+        </div>
+        <div class="reminder-card" data-cat="home">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e8b87c22;color:#e8b87c;">💧</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Water Filter Replacement</div>
+            <div class="reminder-sub">Every 3–6 months • Add date manually</div>
+          </div>
+          <div class="reminder-badge badge-week">Manual</div>
+        </div>
+        <div class="reminder-card" data-cat="home">
+          <div class="check-circle" onclick="toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e8b87c22;color:#e8b87c;">🪲</div>
+          <div class="reminder-body">
+            <div class="reminder-title">Pest Control</div>
+            <div class="reminder-sub">Every 3 months • Add date manually</div>
+          </div>
+          <div class="reminder-badge badge-week">Manual</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════ FINANCE ═══════════════════════════ -->
+    <section class="page" id="page-finance">
+
+      <div class="section-head">
+        <div class="section-title">Finance & Bills</div>
+        <span class="section-link">Summary</span>
+      </div>
+
+      <div class="finance-section">
+
+        <!-- Mortgages & Hire Purchase -->
+        <div class="finance-group open">
+          <div class="finance-group-header" onclick="toggleGroup(this)">
+            <div class="fgroup-icon">🏠</div>
+            <div class="fgroup-title">Property & Vehicle</div>
+            <div class="fgroup-count">3 items</div>
+            <div class="fgroup-chevron">▾</div>
+          </div>
+          <div class="finance-items">
+            <div class="finance-item">
+              <div class="finance-item-name">Mortgage Plaza KJ</div>
+              <div class="finance-item-due">Auto deduct 1st</div>
+              <div class="finance-status status-ok">✓ Auto</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Mortgage Mawar</div>
+              <div class="finance-item-due">Pay before 4th Apr</div>
+              <div class="finance-status status-soon">⚡ 11d</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Hire Purchase Alphard</div>
+              <div class="finance-item-due">Monthly auto</div>
+              <div class="finance-status status-ok">✓ Auto</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plaza KJ Utilities -->
+        <div class="finance-group open">
+          <div class="finance-group-header" onclick="toggleGroup(this)">
+            <div class="fgroup-icon">🏢</div>
+            <div class="fgroup-title">Plaza KJ Utilities</div>
+            <div class="fgroup-count">5 items</div>
+            <div class="fgroup-chevron">▾</div>
+          </div>
+          <div class="finance-items">
+            <div class="finance-item">
+              <div class="finance-item-name">Late & Service Charge + Sinking Fund</div>
+              <div class="finance-item-due">Monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Plaza KJ Water</div>
+              <div class="finance-item-due">Monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Plaza KJ Electricity (TNB)</div>
+              <div class="finance-item-due">Bill out 23rd Mar</div>
+              <div class="finance-status status-due">Bill out</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Plaza KJ IWK</div>
+              <div class="finance-item-due">Monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Plaza KJ Unifi Home</div>
+              <div class="finance-item-due">Bill out ~22nd</div>
+              <div class="finance-status status-due">Bill out</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mawar Utilities -->
+        <div class="finance-group">
+          <div class="finance-group-header" onclick="toggleGroup(this)">
+            <div class="fgroup-icon">🌹</div>
+            <div class="fgroup-title">Mawar Utilities</div>
+            <div class="fgroup-count">2 items</div>
+            <div class="fgroup-chevron">▾</div>
+          </div>
+          <div class="finance-items">
+            <div class="finance-item">
+              <div class="finance-item-name">Late & Service Charge + Sinking Fund</div>
+              <div class="finance-item-due">Monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Mawar Electricity (TNB)</div>
+              <div class="finance-item-due">Bill out 23rd</div>
+              <div class="finance-status status-due">Bill out</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscriptions -->
+        <div class="finance-group">
+          <div class="finance-group-header" onclick="toggleGroup(this)">
+            <div class="fgroup-icon">📱</div>
+            <div class="fgroup-title">Subscriptions & Mobile</div>
+            <div class="fgroup-count">9 items</div>
+            <div class="fgroup-chevron">▾</div>
+          </div>
+          <div class="finance-items">
+            <div class="finance-item">
+              <div class="finance-item-name">CelcomDigi Postpaid</div>
+              <div class="finance-item-due">Bill out 24th</div>
+              <div class="finance-status status-due">Bill out</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">TnG eWallet Top-up</div>
+              <div class="finance-item-due">25th monthly</div>
+              <div class="finance-status status-pending">In 1d</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Apple Music (TnG)</div>
+              <div class="finance-item-due">21st monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">iCloud+ (TnG)</div>
+              <div class="finance-item-due">10th monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">StrengthLog (TnG)</div>
+              <div class="finance-item-due">Every 3 months: May next</div>
+              <div class="finance-status status-pending">May</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Claude Pro (CIMB Debit)</div>
+              <div class="finance-item-due">20th monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Clue (TnG) — Yearly</div>
+              <div class="finance-item-due">20 Jan annually</div>
+              <div class="finance-status status-ok">✓ '26</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Cryptomator (TnG) — Yearly</div>
+              <div class="finance-item-due">15 Nov annually</div>
+              <div class="finance-status status-pending">Nov</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family & Insurance -->
+        <div class="finance-group">
+          <div class="finance-group-header" onclick="toggleGroup(this)">
+            <div class="fgroup-icon">👨‍👩‍👧‍👦</div>
+            <div class="fgroup-title">Family & Savings</div>
+            <div class="fgroup-count">4 items</div>
+            <div class="fgroup-chevron">▾</div>
+          </div>
+          <div class="finance-items">
+            <div class="finance-item">
+              <div class="finance-item-name">Taska (Miki)</div>
+              <div class="finance-item-due">Monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Gym Membership</div>
+              <div class="finance-item-due">1st monthly</div>
+              <div class="finance-status status-ok">✓ Auto</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Umi (Monthly)</div>
+              <div class="finance-item-due">Monthly</div>
+              <div class="finance-status status-ok">✓</div>
+            </div>
+            <div class="finance-item">
+              <div class="finance-item-name">Assessment Tax</div>
+              <div class="finance-item-due">1st March annually</div>
+              <div class="finance-status status-ok">✓ Paid</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ CALENDAR ═══════════════════════════ -->
+    <section class="page" id="page-calendar">
+
+      <div class="calendar-wrap">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calPrev()">‹</button>
+          <div class="cal-month" id="calTitle">March 2026</div>
+          <button class="cal-nav" onclick="calNext()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid">
+          <!-- Days rendered by JS -->
+        </div>
+      </div>
+
+      <!-- School Calendar 2026 -->
+      <div class="section-head">
+        <div class="section-title">📚 School Calendar 2026</div>
+      </div>
+      <div style="padding:0 16px;">
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Term 1</div>
+            <div>
+              <div class="term-name">Penggal 1, 2026</div>
+              <div class="term-dates">2 Jan – 14 Mar 2026 ✓</div>
+            </div>
+          </div>
+          <div>
+            <span class="holiday-pill">🌙 Thaipusam: 11 Feb</span>
+            <span class="holiday-pill">🌙 Israk Mikraj: 27 Jan</span>
+            <span class="holiday-pill">✨ CNY: 29–30 Jan</span>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Break 1</div>
+            <div>
+              <div class="term-name">Mid-term Break 1</div>
+              <div class="term-dates">15 – 23 Mar 2026 ← Current</div>
+            </div>
+          </div>
+          <div>
+            <span class="holiday-pill">🕌 Raya ~30 Mar</span>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Term 2</div>
+            <div>
+              <div class="term-name">Penggal 2, 2026</div>
+              <div class="term-dates">24 Mar – 30 May 2026</div>
+            </div>
+          </div>
+          <div>
+            <span class="holiday-pill">🎂 Miki Birthday: 2 May</span>
+            <span class="holiday-pill">⭐ Wesak: 12 May</span>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Break 2</div>
+            <div>
+              <div class="term-name">Mid-term Break 2</div>
+              <div class="term-dates">31 May – 14 Jun 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Term 3</div>
+            <div>
+              <div class="term-name">Penggal 3, 2026</div>
+              <div class="term-dates">15 Jun – 22 Aug 2026</div>
+            </div>
+          </div>
+          <div>
+            <span class="holiday-pill">🇲🇾 Merdeka: 31 Aug</span>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Break 3</div>
+            <div>
+              <div class="term-name">Mid-term Break 3</div>
+              <div class="term-dates">23 Aug – 6 Sep 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Term 4</div>
+            <div>
+              <div class="term-name">Penggal 4, 2026</div>
+              <div class="term-dates">7 Sep – 14 Nov 2026</div>
+            </div>
+          </div>
+          <div>
+            <span class="holiday-pill">🌙 Deepavali: 20 Oct</span>
+            <span class="holiday-pill">🇲🇾 Malaysia Day: 16 Sep</span>
+          </div>
+        </div>
+
+        <div class="school-term">
+          <div class="term-header">
+            <div class="term-badge">Break 4</div>
+            <div>
+              <div class="term-name">Year-end Holidays</div>
+              <div class="term-dates">15 Nov – 31 Dec 2026</div>
+            </div>
+          </div>
+          <div>
+            <span class="holiday-pill">🎄 Christmas: 25 Dec</span>
+            <span class="holiday-pill">🍾 New Year: 31 Dec</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Lisa SJK(C) Sentul Prep -->
+      <div class="section-head" style="padding-top:16px;">
+        <div class="section-title">🏫 Lisa — SJK(C) Sentul 2027</div>
+      </div>
+
+      <div style="padding:0 16px 8px;">
+        <div class="kid-card">
+          <div class="kid-header">
+            <div class="kid-avatar">👧</div>
+            <div>
+              <div class="kid-name">Lisa</div>
+              <div class="kid-age">4 years old • Starts Jan 2027 • ~9 months</div>
+            </div>
+          </div>
+
+          <div class="progress-row">
+            <div class="progress-label">Overall Prep</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:20%"></div></div>
+            <div class="progress-pct">20%</div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <div class="vax-item">
+              <div class="vax-check">⬜</div>
+              <div class="vax-name">School registration / SJK(C) Sentul enrolment</div>
+              <div class="vax-date">By Oct 2026</div>
+            </div>
+            <div class="vax-item">
+              <div class="vax-check">⬜</div>
+              <div class="vax-name">APDM parent registration</div>
+              <div class="vax-date">With school</div>
+            </div>
+            <div class="vax-item">
+              <div class="vax-check">⬜</div>
+              <div class="vax-name">Booster vaccinations (before Year 1)</div>
+              <div class="vax-date">2026</div>
+            </div>
+            <div class="vax-item">
+              <div class="vax-check">⬜</div>
+              <div class="vax-name">School uniform, bag, stationery</div>
+              <div class="vax-date">Dec 2026</div>
+            </div>
+            <div class="vax-item">
+              <div class="vax-check">⬜</div>
+              <div class="vax-name">Chinese reading/writing prep</div>
+              <div class="vax-date">Ongoing</div>
+            </div>
+            <div class="vax-item">
+              <div class="vax-check">✅</div>
+              <div class="vax-name">Research SJK(C) Sentul school location</div>
+              <div class="vax-date">Done</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Holidays -->
+      <div class="section-head" style="padding-top:4px;">
+        <div class="section-title">🇲🇾 Public Holidays 2026</div>
+      </div>
+
+      <div style="padding:0 16px 8px;">
+        <div class="ph-chip"><div class="ph-chip-date">1 Jan</div><div class="ph-chip-name">New Year's Day</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">27 Jan</div><div class="ph-chip-name">Israk Mikraj</div><div class="ph-chip-state">KL/Sel</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">29–30 Jan</div><div class="ph-chip-name">Chinese New Year</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">1 Feb</div><div class="ph-chip-name">Federal Territory Day</div><div class="ph-chip-state">KL</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">11 Feb</div><div class="ph-chip-name">Thaipusam</div><div class="ph-chip-state">KL/Sel</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">~30 Mar</div><div class="ph-chip-name">Hari Raya Aidilfitri</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">~31 Mar</div><div class="ph-chip-name">Hari Raya (Day 2)</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">1 May</div><div class="ph-chip-name">Labour Day</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">~6 Jun</div><div class="ph-chip-name">Yang di-Pertuan Agong Birthday</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">12 May</div><div class="ph-chip-name">Wesak Day</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">7 Jun</div><div class="ph-chip-name">Hari Raya Haji</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">27 Jun</div><div class="ph-chip-name">Awal Muharram</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">31 Aug</div><div class="ph-chip-name">Hari Merdeka</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">16 Sep</div><div class="ph-chip-name">Malaysia Day</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">5 Sep</div><div class="ph-chip-name">Maulidur Rasul</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">20 Oct</div><div class="ph-chip-name">Deepavali</div><div class="ph-chip-state">National</div></div>
+        <div class="ph-chip"><div class="ph-chip-date">25 Dec</div><div class="ph-chip-name">Christmas Day</div><div class="ph-chip-state">National</div></div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════ FAMILY ═══════════════════════════ -->
+    <section class="page" id="page-family">
+
+      <div class="section-head">
+        <div class="section-title">Family Hub</div>
+      </div>
+
+      <!-- Kids -->
+      <div style="padding:0 16px;">
+
+        <!-- Lisa -->
+        <div class="kid-card">
+          <div class="kid-header">
+            <div class="kid-avatar">👧</div>
+            <div>
+              <div class="kid-name">Lisa</div>
+              <div class="kid-age">4 years old • Birthday: 12 March • SJK(C) Sentul 2027</div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Vaccinations</div>
+
+          <div class="vax-item">
+            <div class="vax-check">✅</div>
+            <div class="vax-name">MMR Booster (18m)</div>
+            <div class="vax-date">Done</div>
+          </div>
+          <div class="vax-item">
+            <div class="vax-check">✅</div>
+            <div class="vax-name">DTaP Booster (18m)</div>
+            <div class="vax-date">Done</div>
+          </div>
+          <div class="vax-item">
+            <div class="vax-check">⬜</div>
+            <div class="vax-name">MMR 2nd dose (7y)</div>
+            <div class="vax-date">2028</div>
+          </div>
+          <div class="vax-item">
+            <div class="vax-check">⬜</div>
+            <div class="vax-name">School pre-entry booster</div>
+            <div class="vax-date">Before Jan 2027</div>
+          </div>
+
+          <div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">School Prep</div>
+          <div class="progress-row">
+            <div class="progress-label">SJK(C) Sentul Readiness</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:20%"></div></div>
+            <div class="progress-pct">20%</div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label">Chinese Literacy</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:10%;background:var(--crescent);"></div></div>
+            <div class="progress-pct">10%</div>
+          </div>
+
+        </div>
+
+        <!-- Miki -->
+        <div class="kid-card">
+          <div class="kid-header">
+            <div class="kid-avatar">👦</div>
+            <div>
+              <div class="kid-name">Miki</div>
+              <div class="kid-age">3 years old • Birthday: 2 May • Taska Di Rumah Ayu</div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Vaccinations</div>
+
+          <div class="vax-item">
+            <div class="vax-check">✅</div>
+            <div class="vax-name">MMR Booster (18m)</div>
+            <div class="vax-date">Done</div>
+          </div>
+          <div class="vax-item">
+            <div class="vax-check">✅</div>
+            <div class="vax-name">DTaP Booster (18m)</div>
+            <div class="vax-date">Done</div>
+          </div>
+          <div class="vax-item">
+            <div class="vax-check">⬜</div>
+            <div class="vax-name">Flu Vaccine (annual)</div>
+            <div class="vax-date">Annual</div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
+              <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
+              <div class="reminder-body">
+                <div class="reminder-title">Miki turns 4 on 2 May!</div>
+                <div class="reminder-sub">Plan something fun — 39 days away</div>
+              </div>
+              <div class="reminder-badge badge-week">39d</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thomas -->
+        <div class="kid-card">
+          <div class="kid-header">
+            <div class="kid-avatar">💑</div>
+            <div>
+              <div class="kid-name">Thomas</div>
+              <div class="kid-age">Partner • Birthday: 12 February</div>
+            </div>
+          </div>
+
+          <div class="reminder-card" style="margin:0 0 8px;border-radius:var(--radius-sm);">
+            <div class="check-circle checked" style="margin-top:7px;">✓</div>
+            <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
+            <div class="reminder-body">
+              <div class="reminder-title">Thomas's Birthday — 12 Feb</div>
+              <div class="reminder-sub">Arrange dinner / buy cake • This year passed ✓</div>
+            </div>
+            <div class="reminder-badge badge-done">Done</div>
+          </div>
+
+          <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
+            <div class="check-circle" onclick="toggleCheck(this)"></div>
+            <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🍽️</div>
+            <div class="reminder-body">
+              <div class="reminder-title">Plan Date Night with Thomas</div>
+              <div class="reminder-sub">It's been a while — plan something nice 💖</div>
+            </div>
+            <div class="reminder-badge badge-week">Soon</div>
+          </div>
+
+        </div>
+
+        <!-- Syabil -->
+        <div class="kid-card">
+          <div class="kid-header">
+            <div class="kid-avatar">👦</div>
+            <div>
+              <div class="kid-name">Syabil</div>
+              <div class="kid-age">Stepson • Birthday: 8 March</div>
+            </div>
+          </div>
+          <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
+            <div class="check-circle checked" style="margin-top:7px;">✓</div>
+            <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
+            <div class="reminder-body">
+              <div class="reminder-title">Syabil's Birthday — 8 March</div>
+              <div class="reminder-sub">Passed this year — did you celebrate? 🎉</div>
+            </div>
+            <div class="reminder-badge badge-done">Passed</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Meal Planner -->
+      <div class="section-head" style="padding-top:6px;">
+        <div class="section-title">🍽️ This Week's Meals</div>
+        <span class="section-link">Edit</span>
+      </div>
+
+      <div style="padding:0 16px 8px;">
+        <div class="meal-day">
+          <div class="meal-day-head">
+            <div class="meal-day-name">Tuesday</div>
+            <div class="meal-day-date">24 Mar</div>
+          </div>
+          <div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-value">Nasi goreng kampung + telur mata</div></div>
+          <div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Sup tulang + nasi putih</div></div>
+        </div>
+        <div class="meal-day">
+          <div class="meal-day-head">
+            <div class="meal-day-name">Wednesday</div>
+            <div class="meal-day-date">25 Mar</div>
+          </div>
+          <div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-empty">Not planned yet</div></div>
+          <div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Ayam masak merah + pucuk paku</div></div>
+        </div>
+        <div class="meal-day">
+          <div class="meal-day-head">
+            <div class="meal-day-name">Thursday</div>
+            <div class="meal-day-date">26 Mar</div>
+          </div>
+          <div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-empty">Not planned yet</div></div>
+          <div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-empty">Not planned yet</div></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════ SETTINGS ═══════════════════════════ -->
+    <section class="page" id="page-settings">
+
+      <div class="profile-card">
+        <div class="profile-avatar">👩‍💻</div>
+        <div>
+          <div class="profile-name">Ummi</div>
+          <div class="profile-title">L3 Cloud Admin • VMware + Hyper-V • KL, Malaysia</div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">Appearance</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="toggleTheme()">
+            <div class="settings-icon">🌙</div>
+            <div class="settings-label">Dark Mode</div>
+            <button class="toggle on" id="themeToggleSettings" onclick="event.stopPropagation();toggleTheme()"></button>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">🌸</div>
+            <div class="settings-label">Color Theme</div>
+            <div class="settings-value">Rose Gold</div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">🔤</div>
+            <div class="settings-label">Font</div>
+            <div class="settings-value">Playfair + Nunito</div>
+            <div class="settings-arrow">›</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">AI & Sync</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-icon">🤖</div>
+            <div class="settings-label">Anthropic API Key</div>
+            <div class="settings-value">Not set</div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">☁️</div>
+            <div class="settings-label">Google Drive Sync</div>
+            <div class="settings-value">Phase 3</div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">🔐</div>
+            <div class="settings-label">Google Account</div>
+            <div class="settings-value">Not signed in</div>
+            <div class="settings-arrow">›</div>
+          </div>
+        </div>
+
+        <div style="padding:0 4px 8px;">
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;color:var(--text);">🔑 Paste Anthropic API Key</label>
+          <input class="settings-input" type="password" placeholder="sk-ant-api03-..." id="apiKeyInput">
+          <button onclick="saveApiKey()" style="margin-top:8px;width:100%;padding:10px;background:var(--rose-gold);border:none;border-radius:10px;color:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;">Save Key</button>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">Data</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-icon">📦</div>
+            <div class="settings-label">Export Data</div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">📥</div>
+            <div class="settings-label">Import Data</div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">🗑️</div>
+            <div class="settings-label" style="color:#e87c7c;">Clear All Data</div>
+            <div class="settings-arrow">›</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">Notifications</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-icon">🔔</div>
+            <div class="settings-label">Push Notifications</div>
+            <button class="toggle on" onclick="event.stopPropagation()"></button>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">⏰</div>
+            <div class="settings-label">Daily Reminder Time</div>
+            <div class="settings-value">8:00 AM</div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-icon">📅</div>
+            <div class="settings-label">Bill Reminder (days before)</div>
+            <div class="settings-value">3 days</div>
+            <div class="settings-arrow">›</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">
+          Mommy Reminder Hub v1.0 (Phase 1 — UI Preview)<br>
+          Built with ☽ &amp; 🌸 for a super Ummi in KL
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FAB -->
+  <button class="fab" onclick="showAddModal()" title="Add reminder">+</button>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-today" onclick="showPage('today')">
+      <span class="nav-icon">🏠</span>
+      <span>Today</span>
+    </button>
+    <button class="nav-item" id="nav-reminders" onclick="showPage('reminders')">
+      <span class="nav-icon">🔔</span>
+      <span>Reminders</span>
+      <span class="nav-badge">5</span>
+    </button>
+    <button class="nav-item" id="nav-finance" onclick="showPage('finance')">
+      <span class="nav-icon">💳</span>
+      <span>Finance</span>
+    </button>
+    <button class="nav-item" id="nav-calendar" onclick="showPage('calendar')">
+      <span class="nav-icon">📅</span>
+      <span>Calendar</span>
+    </button>
+    <button class="nav-item" id="nav-family" onclick="showPage('family')">
+      <span class="nav-icon">👨‍👩‍👧</span>
+      <span>Family</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Page Navigation ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+}
+
+// ── Theme Toggle ──
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.dataset.theme = isDark ? 'dark' : 'light';
+  document.getElementById('themeToggle').textContent = isDark ? '🌙' : '☀️';
+  const settingsToggle = document.getElementById('themeToggleSettings');
+  if (settingsToggle) {
+    settingsToggle.classList.toggle('on', isDark);
+  }
+}
+
+// ── Finance Group Toggle ──
+function toggleGroup(header) {
+  header.closest('.finance-group').classList.toggle('open');
+}
+
+// ── Check/Done ──
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.textContent = el.classList.contains('checked') ? '✓' : '';
+  const card = el.closest('.reminder-card');
+  if (card) card.classList.toggle('done', el.classList.contains('checked'));
+}
+
+function toggleDone(card) {
+  const circle = card.querySelector('.check-circle');
+  if (circle) toggleCheck(circle);
+}
+
+// ── Category filter ──
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  // In Phase 1 just show toast — full filtering in Phase 2
+  if (cat !== 'all') showToast('Filtering: ' + cat);
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Save API Key ──
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val) { showToast('Please enter an API key'); return; }
+  showToast('API key saved ✓');
+  document.getElementById('apiKeyInput').value = '';
+}
+
+// ── Add Modal (placeholder) ──
+function showAddModal() {
+  showToast('+ Add reminder (Phase 2)');
+}
+
+// ── Calendar ──
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const PH = {
+  '2026-1-1':true,'2026-1-27':true,'2026-1-29':true,'2026-1-30':true,
+  '2026-2-1':true,'2026-2-11':true,'2026-2-12':true,
+  '2026-3-8':true,'2026-3-12':true,
+  '2026-3-30':true,'2026-3-31':true,
+  '2026-5-1':true,'2026-5-2':true,'2026-5-12':true,
+  '2026-6-7':true,'2026-6-27':true,
+  '2026-8-31':true,
+  '2026-9-5':true,'2026-9-16':true,
+  '2026-10-20':true,
+  '2026-12-25':true
+};
+
+let calYear = 2026, calMonth = 2; // 0-indexed, March
+
+function renderCal() {
+  document.getElementById('calTitle').textContent = MONTHS[calMonth] + ' ' + calYear;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Day headers
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const prevDays = new Date(calYear, calMonth, 0).getDate();
+  const today = new Date();
+
+  // Prev month
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const el = document.createElement('div');
+    el.className = 'cal-day other-month';
+    el.textContent = prevDays - i;
+    grid.appendChild(el);
+  }
+
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+
+    const key = `${calYear}-${calMonth+1}-${d}`;
+    if (PH[key]) el.classList.add('has-event');
+    if (calYear === today.getFullYear() && calMonth === today.getMonth() && d === today.getDate()) {
+      el.classList.add('today');
+    }
+    // Public holiday red
+    if (PH[key] && (key.includes('-3-30') || key.includes('-3-31') || key.includes('-8-31') || key.includes('-5-1') || key.includes('-9-16'))) {
+      el.classList.add('ph');
+    }
+
+    grid.appendChild(el);
+  }
+}
+
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCal();
+}
+
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCal();
+}
+
+// Init
+renderCal();
+</script>
+
+</body>
+</html>
