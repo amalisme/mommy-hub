@@ -4,2246 +4,1604 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mommy Reminder Hub</title>
+<link rel="manifest" href="/mommy-hub/manifest.json">
+<meta name="theme-color" content="#a0714f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mommy Hub">
+<link rel="apple-touch-icon" href="/mommy-hub/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    /* Rose gold & blush palette */
-    --rose-gold: #c9956b;
-    --rose-gold-light: #e8b99a;
-    --rose-gold-dark: #a0714f;
-    --blush: #f7ddd6;
-    --blush-deep: #f0c4b8;
-    --blush-pale: #fdf4f1;
-    --cream: #fef9f6;
-    --crescent: #d4a96a;
-
-    /* Dark mode surfaces */
-    --dark-bg: #1a1210;
-    --dark-surface: #241a17;
-    --dark-card: #2e2118;
-    --dark-border: #3d2e25;
-    --dark-text: #f5e8df;
-    --dark-muted: #a08070;
-
-    /* Light mode surfaces */
-    --light-bg: #fdf6f2;
-    --light-surface: #ffffff;
-    --light-card: #ffffff;
-    --light-border: #f0d8cc;
-    --light-text: #2a1810;
-    --light-muted: #9a7060;
-
-    /* Category colors */
-    --cat-grocery: #e8a87c;
-    --cat-school: #7cb8e8;
-    --cat-birthday: #e87cb8;
-    --cat-holiday: #a8e87c;
-    --cat-pubhol: #e8d47c;
-    --cat-work: #7c9ee8;
-    --cat-health: #e87c7c;
-    --cat-finance: #7ce8c4;
-    --cat-selfcare: #c47ce8;
-    --cat-home: #e8b87c;
-    --cat-meals: #f0a060;
-
-    /* Active theme (default dark) */
-    --bg: var(--dark-bg);
-    --surface: var(--dark-surface);
-    --card: var(--dark-card);
-    --border: var(--dark-border);
-    --text: var(--dark-text);
-    --muted: var(--dark-muted);
-
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-body: 'Nunito', 'Segoe UI', sans-serif;
-    --radius: 16px;
-    --radius-sm: 10px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.18);
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.12);
-    --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  [data-theme="light"] {
-    --bg: var(--light-bg);
-    --surface: var(--light-surface);
-    --card: var(--light-card);
-    --border: var(--light-border);
-    --text: var(--light-text);
-    --muted: var(--light-muted);
-    --shadow: 0 4px 24px rgba(180,100,60,0.10);
-    --shadow-sm: 0 2px 8px rgba(180,100,60,0.08);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  html, body {
-    height: 100%;
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.5;
-    transition: background var(--transition), color var(--transition);
-  }
-
-  /* ── App Shell ── */
-  #app {
-    max-width: 430px;
-    margin: 0 auto;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    background: var(--bg);
-  }
-
-  /* ── Top Header ── */
-  .app-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  .header-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .brand-icon {
-    width: 34px;
-    height: 34px;
-    background: linear-gradient(135deg, var(--rose-gold) 0%, var(--crescent) 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(201,149,107,0.35);
-  }
-
-  .brand-text {
-    font-family: var(--font-display);
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--rose-gold);
-    letter-spacing: -0.2px;
-  }
-
-  .brand-sub {
-    font-size: 10px;
-    color: var(--muted);
-    font-weight: 400;
-    margin-top: -2px;
-    font-family: var(--font-body);
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .icon-btn {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    transition: background var(--transition), color var(--transition);
-  }
-
-  .icon-btn:active { background: var(--border); }
-  .icon-btn.active { color: var(--rose-gold); }
-
-  /* ── Main Content ── */
-  .main-content {
-    flex: 1;
-    overflow-y: auto;
-    padding-bottom: 80px;
-    scroll-behavior: smooth;
-  }
-
-  /* ── Bottom Nav ── */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 430px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: stretch;
-    z-index: 100;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    padding: 8px 4px 6px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--muted);
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 500;
-    transition: color var(--transition);
-    position: relative;
-  }
-
-  .nav-item .nav-icon { font-size: 20px; line-height: 1; }
-
-  .nav-item.active { color: var(--rose-gold); }
-
-  .nav-item.active::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    background: var(--rose-gold);
-    border-radius: 0 0 3px 3px;
-  }
-
-  /* ── Pages ── */
-  .page { display: none; animation: fadeUp 0.28s ease; }
-  .page.active { display: block; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── Section heading ── */
-  .section-head {
-    padding: 20px 20px 10px;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-  }
-
-  .section-title {
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .section-link {
-    font-size: 12px;
-    color: var(--rose-gold);
-    text-decoration: none;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  /* ── Date strip ── */
-  .date-strip {
-    padding: 16px 20px 0;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .date-big {
-    font-family: var(--font-display);
-    font-size: 13px;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .date-num {
-    font-family: var(--font-display);
-    font-size: 38px;
-    font-weight: 700;
-    color: var(--rose-gold);
-    line-height: 1;
-  }
-
-  /* ── AI Nudge Cards ── */
-  .nudge-wrap {
-    position: relative;
-  }
-  .nudge-wrap::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 4px;
-    width: 48px;
-    background: linear-gradient(to right, transparent, var(--bg));
-    pointer-events: none;
-    z-index: 2;
-  }
-  .nudge-scroll {
-    padding: 12px 0 4px 20px;
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .nudge-scroll::-webkit-scrollbar { display: none; }
-  .nudge-scroll::after { content: ''; min-width: 48px; display: block; flex-shrink: 0; }
-
-  .nudge-card {
-    flex-shrink: 0;
-    width: 240px;
-    background: linear-gradient(135deg, var(--rose-gold-dark) 0%, var(--rose-gold) 60%, var(--crescent) 100%);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    color: #fff;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 16px rgba(201,149,107,0.3);
-  }
-
-  .nudge-card::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    width: 80px;
-    height: 80px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 50%;
-  }
-
-  .nudge-emoji { font-size: 22px; margin-bottom: 6px; }
-  .nudge-text { font-size: 13px; line-height: 1.45; font-weight: 500; }
-  .nudge-tag {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 10px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 2px 8px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-
-  /* ── Reminder Card ── */
-  .reminder-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
-
-  .reminder-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    transition: border-color var(--transition), box-shadow var(--transition);
-    cursor: pointer;
-    position: relative;
-  }
-
-  .reminder-card:active { box-shadow: var(--shadow-sm); }
-
-  .reminder-card.done { opacity: 0.5; }
-  .reminder-card.done .reminder-title { text-decoration: line-through; }
-
-  .reminder-card.urgent {
-    border-left: 3px solid #e87c7c;
-  }
-  .reminder-card.soon {
-    border-left: 3px solid var(--crescent);
-  }
-
-  .cat-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-
-  .reminder-body { flex: 1; min-width: 0; }
-  .reminder-title { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .reminder-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .reminder-badge {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 20px;
-    flex-shrink: 0;
-    align-self: flex-start;
-    margin-top: 2px;
-  }
-
-  .badge-today { background: #e87c7c22; color: #e87c7c; }
-  .badge-soon { background: var(--crescent); color: #fff; opacity: 0.9; }
-  .badge-week { background: var(--blush-deep); color: var(--rose-gold-dark); }
-  .badge-done { background: #7ce87c22; color: #5ab85a; }
-
-  /* ── Checkbox ── */
-  .check-circle {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 7px;
-    transition: border-color var(--transition), background var(--transition);
-    font-size: 12px;
-    cursor: pointer;
-  }
-  .check-circle.checked { border-color: var(--rose-gold); background: var(--rose-gold); color: #fff; }
-
-  /* ── Category chips ── */
-  .cat-chips {
-    padding: 10px 20px 4px;
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .cat-chips::-webkit-scrollbar { display: none; }
-
-  .cat-chip {
-    flex-shrink: 0;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    font-family: var(--font-body);
-    transition: all var(--transition);
-    white-space: nowrap;
-  }
-  .cat-chip.active {
-    background: var(--rose-gold);
-    border-color: var(--rose-gold);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(201,149,107,0.3);
-  }
-
-  /* ── Finance Cards ── */
-  .finance-section { padding: 0 16px; }
-
-  .finance-group {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 12px;
-  }
-
-  .finance-group-header {
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .fgroup-icon { font-size: 18px; }
-  .fgroup-title { font-weight: 700; font-size: 14px; flex: 1; }
-  .fgroup-count { font-size: 11px; color: var(--muted); }
-  .fgroup-chevron { font-size: 14px; color: var(--muted); transition: transform var(--transition); }
-  .finance-group.open .fgroup-chevron { transform: rotate(180deg); }
-
-  .finance-items { display: none; }
-  .finance-group.open .finance-items { display: block; }
-
-  .finance-item {
-    padding: 10px 16px 10px 46px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .finance-item-name { flex: 1; font-size: 13px; font-weight: 500; }
-  .finance-item-due { font-size: 11px; color: var(--muted); }
-  .finance-status {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-  }
-  .status-due { background: #e87c7c22; color: #e87c7c; }
-  .status-ok { background: #7ce87c22; color: #5ab85a; }
-  .status-soon { background: var(--crescent); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 20px; opacity: 0.85; }
-  .status-pending { background: var(--blush-deep); color: var(--rose-gold-dark); }
-
-  /* ── Summary Row ── */
-  .summary-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    padding: 14px 16px 4px;
-  }
-
-  .summary-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 10px;
-    text-align: center;
-  }
-
-  .summary-num {
-    font-family: var(--font-display);
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--rose-gold);
-    line-height: 1;
-  }
-
-  .summary-label {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 4px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  /* ── Calendar View ── */
-  .calendar-wrap { padding: 0 16px; }
-
-  .cal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 0 12px;
-  }
-
-  .cal-month {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .cal-nav {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 8px;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-  }
-
-  .cal-day-name {
-    text-align: center;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--muted);
-    padding: 4px 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .cal-day {
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    position: relative;
-    cursor: pointer;
-    transition: background var(--transition);
-    gap: 2px;
-  }
-
-  .cal-day:active { background: var(--border); }
-  .cal-day.other-month { color: var(--border); }
-  .cal-day.today {
-    background: var(--rose-gold);
-    color: #fff;
-    font-weight: 700;
-  }
-  .cal-day.has-event::after {
-    content: '';
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--crescent);
-    position: absolute;
-    bottom: 3px;
-  }
-  .cal-day.today.has-event::after { background: #fff; }
-
-  .cal-day.ph { color: #e87c7c; font-weight: 700; }
-  .cal-day.holiday { background: #e8d47c18; }
-
-  /* ── School Calendar ── */
-  .school-term {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 8px;
-  }
-
-  .term-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  .term-badge {
-    background: var(--rose-gold);
-    color: #fff;
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .term-name { font-weight: 700; font-size: 14px; }
-  .term-dates { font-size: 12px; color: var(--muted); }
-
-  .holiday-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--blush);
-    color: var(--rose-gold-dark);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    margin: 2px 3px 2px 0;
-  }
-
-  [data-theme="light"] .holiday-pill {
-    background: var(--blush-deep);
-  }
-
-  /* ── Kids Section ── */
-  .kid-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 10px;
-  }
-
-  .kid-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .kid-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    background: linear-gradient(135deg, var(--blush-deep), var(--rose-gold-light));
-    flex-shrink: 0;
-  }
-
-  .kid-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
-  .kid-age { font-size: 12px; color: var(--muted); }
-
-  .progress-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  .progress-label { font-size: 12px; font-weight: 600; flex: 1; }
-  .progress-bar-wrap { flex: 2; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; border-radius: 3px; background: var(--rose-gold); transition: width 0.5s ease; }
-  .progress-pct { font-size: 11px; color: var(--muted); width: 32px; text-align: right; }
-
-  .vax-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .vax-item:last-child { border-bottom: none; }
-
-  .vax-check { font-size: 15px; flex-shrink: 0; }
-  .vax-name { font-size: 13px; flex: 1; }
-  .vax-date { font-size: 11px; color: var(--muted); }
-
-  /* ── Meal Planner ── */
-  .meal-day {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    margin-bottom: 8px;
-  }
-
-  .meal-day-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-
-  .meal-day-name { font-weight: 700; font-size: 14px; }
-  .meal-day-date { font-size: 11px; color: var(--muted); }
-
-  .meal-slot {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 0;
-  }
-
-  .meal-slot-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--muted);
-    width: 52px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    flex-shrink: 0;
-  }
-
-  .meal-slot-value { font-size: 13px; color: var(--text); }
-  .meal-slot-empty { font-size: 13px; color: var(--border); font-style: italic; }
-
-  /* ── Add Button ── */
-  .fab {
-    position: fixed;
-    bottom: 88px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, var(--rose-gold), var(--crescent));
-    border: none;
-    border-radius: 14px;
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(201,149,107,0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 99;
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow var(--transition), opacity 0.3s;
-  }
-  .fab:active { transform: scale(0.93); box-shadow: 0 2px 8px rgba(201,149,107,0.3); }
-  .fab.hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
-
-  /* ── Settings ── */
-  .settings-section {
-    padding: 0 16px;
-    margin-bottom: 16px;
-  }
-
-  .settings-group {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 12px;
-  }
-
-  .settings-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: background var(--transition);
-  }
-
-  .settings-row:last-child { border-bottom: none; }
-  .settings-row:active { background: var(--border); }
-
-  .settings-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
-  .settings-label { flex: 1; font-size: 14px; font-weight: 500; }
-  .settings-value { font-size: 12px; color: var(--muted); }
-  .settings-arrow { font-size: 14px; color: var(--muted); }
-
-  /* ── Toggle ── */
-  .toggle {
-    width: 44px;
-    height: 26px;
-    background: var(--border);
-    border-radius: 13px;
-    position: relative;
-    cursor: pointer;
-    transition: background var(--transition);
-    flex-shrink: 0;
-    border: none;
-  }
-
-  .toggle.on { background: var(--rose-gold); }
-
-  .toggle::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform var(--transition);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  }
-
-  .toggle.on::after { transform: translateX(18px); }
-
-  /* ── API key input ── */
-  .settings-input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    margin-top: 8px;
-    transition: border-color var(--transition);
-  }
-
-  .settings-input:focus { border-color: var(--rose-gold); }
-
-  /* ── Profile card ── */
-  .profile-card {
-    margin: 16px;
-    background: linear-gradient(135deg, var(--rose-gold-dark) 0%, var(--rose-gold) 60%, var(--crescent) 100%);
-    border-radius: var(--radius);
-    padding: 20px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .profile-avatar {
-    width: 56px;
-    height: 56px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    flex-shrink: 0;
-  }
-
-  .profile-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
-  .profile-title { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-
-  /* ── Empty state ── */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-  }
-  .empty-state .es-icon { font-size: 40px; margin-bottom: 10px; }
-  .empty-state p { font-size: 14px; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text);
-    color: var(--bg);
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    z-index: 200;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── Scrollable reminder list with category filter ── */
-  .sticky-cats {
-    position: sticky;
-    top: 57px;
-    background: var(--bg);
-    z-index: 50;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-  }
-
-  /* ── Upcoming count badge ── */
-  .nav-badge {
-    position: absolute;
-    top: 6px;
-    right: calc(50% - 18px);
-    background: #e87c7c;
-    color: #fff;
-    border-radius: 10px;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 5px;
-    min-width: 16px;
-    text-align: center;
-  }
-
-  /* ── Public Holiday Chip ── */
-  .ph-chip {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    margin-bottom: 6px;
-  }
-  .ph-chip-date { font-size: 12px; font-weight: 700; color: var(--rose-gold); width: 80px; flex-shrink: 0; }
-  .ph-chip-name { font-size: 13px; font-weight: 500; flex: 1; }
-  .ph-chip-state { font-size: 10px; color: var(--muted); background: var(--border); padding: 2px 7px; border-radius: 10px; flex-shrink: 0; }
-
-  /* ── Work card ── */
-  .work-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-  }
-
-  .work-icon { font-size: 22px; flex-shrink: 0; }
-  .work-body { flex: 1; }
-  .work-title { font-weight: 600; font-size: 14px; }
-  .work-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .work-status { font-size: 11px; font-weight: 700; flex-shrink: 0; }
-
-  /* responsive tweaks */
-  @media (max-width: 380px) {
-    .brand-text { font-size: 15px; }
-    .date-num { font-size: 32px; }
-    .summary-num { font-size: 22px; }
-  }
+:root {
+  --rose-gold:#c9956b; --rose-gold-light:#e8b99a; --rose-gold-dark:#a0714f;
+  --blush:#f7ddd6; --blush-deep:#f0c4b8; --blush-pale:#fdf4f1; --cream:#fef9f6;
+  --crescent:#d4a96a;
+  --dark-bg:#1a1210; --dark-surface:#241a17; --dark-card:#2e2118;
+  --dark-border:#3d2e25; --dark-text:#f5e8df; --dark-muted:#a08070;
+  --light-bg:#fdf6f2; --light-surface:#fff; --light-card:#fff;
+  --light-border:#f0d8cc; --light-text:#2a1810; --light-muted:#9a7060;
+  --bg:var(--dark-bg); --surface:var(--dark-surface); --card:var(--dark-card);
+  --border:var(--dark-border); --text:var(--dark-text); --muted:var(--dark-muted);
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Nunito','Segoe UI',sans-serif;
+  --radius:16px; --radius-sm:10px;
+  --shadow:0 4px 24px rgba(0,0,0,.18);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.12);
+  --transition:.22s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --bg:var(--light-bg); --surface:var(--light-surface); --card:var(--light-card);
+  --border:var(--light-border); --text:var(--light-text); --muted:var(--light-muted);
+  --shadow:0 4px 24px rgba(180,100,60,.10); --shadow-sm:0 2px 8px rgba(180,100,60,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.5;transition:background var(--transition),color var(--transition)}
+
+/* ── App Shell ── */
+#app{max-width:430px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+.app-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.header-brand{display:flex;align-items:center;gap:8px}
+.brand-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--rose-gold),var(--crescent));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;
+  flex-shrink:0;box-shadow:0 2px 8px rgba(201,149,107,.35)}
+.brand-text{font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--rose-gold);letter-spacing:-.2px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:36px;height:36px;border:none;background:transparent;color:var(--muted);cursor:pointer;
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;
+  transition:background var(--transition),color var(--transition)}
+.icon-btn:active{background:var(--border)}
+
+/* ── Sync status dot ── */
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-left:6px;flex-shrink:0}
+.sync-dot.synced{background:#5ab85a} .sync-dot.syncing{background:var(--crescent);animation:pulse 1s infinite}
+.sync-dot.error{background:#e87c7c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Offline banner ── */
+.offline-banner{background:#e87c7c;color:#fff;text-align:center;font-size:12px;font-weight:700;
+  padding:6px 16px;display:none}
+.offline-banner.show{display:block}
+
+/* ── Main Content ── */
+.main-content{flex:1;overflow-y:auto;padding-bottom:80px;scroll-behavior:smooth}
+
+/* ── Bottom Nav ── */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
+  background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:stretch;
+  z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;
+  background:none;border:none;cursor:pointer;color:var(--muted);font-family:var(--font-body);
+  font-size:9px;font-weight:500;transition:color var(--transition);position:relative}
+.nav-item .nav-icon{font-size:19px;line-height:1}
+.nav-item.active{color:var(--rose-gold)}
+.nav-item.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
+  background:var(--rose-gold);border-radius:0 0 3px 3px}
+.nav-badge{position:absolute;top:6px;right:calc(50% - 18px);background:#e87c7c;color:#fff;
+  border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
+
+/* ── Pages ── */
+.page{display:none;animation:fadeUp .28s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Section heading ── */
+.section-head{padding:20px 20px 10px;display:flex;align-items:baseline;justify-content:space-between}
+.section-title{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text)}
+.section-link{font-size:12px;color:var(--rose-gold);text-decoration:none;font-weight:600;cursor:pointer}
+
+/* ── Date strip ── */
+.date-strip{padding:16px 20px 0;display:flex;align-items:flex-end;justify-content:space-between}
+.date-big{font-family:var(--font-display);font-size:13px;color:var(--muted);font-style:italic}
+.date-num{font-family:var(--font-display);font-size:38px;font-weight:700;color:var(--rose-gold);line-height:1}
+
+/* ── AI Nudge Cards ── */
+.nudge-wrap{position:relative}
+.nudge-wrap::after{content:'';position:absolute;top:0;right:0;bottom:4px;width:48px;
+  background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;z-index:2}
+.nudge-scroll{padding:12px 0 4px 20px;display:flex;gap:10px;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nudge-scroll::-webkit-scrollbar{display:none}
+.nudge-scroll::after{content:'';min-width:48px;display:block;flex-shrink:0}
+.nudge-card{flex-shrink:0;width:240px;background:linear-gradient(135deg,var(--rose-gold-dark),var(--rose-gold) 60%,var(--crescent));
+  border-radius:var(--radius);padding:14px 16px;color:#fff;position:relative;overflow:hidden;
+  box-shadow:0 4px 16px rgba(201,149,107,.3)}
+.nudge-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;
+  background:rgba(255,255,255,.08);border-radius:50%}
+.nudge-card.loading{opacity:.6}
+.nudge-card.offline-card{background:linear-gradient(135deg,#4a4a4a,#666)!important}
+.nudge-emoji{font-size:22px;margin-bottom:6px}
+.nudge-text{font-size:13px;line-height:1.45;font-weight:500}
+.nudge-tag{display:inline-block;margin-top:8px;font-size:10px;background:rgba(255,255,255,.2);
+  border-radius:20px;padding:2px 8px;font-weight:600;letter-spacing:.3px}
+.nudge-loading{display:flex;align-items:center;justify-content:center;height:80px;
+  font-size:13px;color:rgba(255,255,255,.7);gap:8px}
+.nudge-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Summary row ── */
+.summary-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 16px 4px}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 10px;text-align:center}
+.summary-num{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--rose-gold);line-height:1}
+.summary-label{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.5px}
+
+/* ── Reminder Cards ── */
+.reminder-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.reminder-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;display:flex;align-items:flex-start;gap:12px;
+  transition:border-color var(--transition),box-shadow var(--transition),opacity var(--transition);
+  cursor:pointer;position:relative}
+.reminder-card:active{box-shadow:var(--shadow-sm)}
+.reminder-card.done{opacity:.45}
+.reminder-card.done .reminder-title{text-decoration:line-through}
+.reminder-card.urgent{border-left:3px solid #e87c7c}
+.reminder-card.soon{border-left:3px solid var(--crescent)}
+.cat-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:16px;flex-shrink:0}
+.reminder-body{flex:1;min-width:0}
+.reminder-title{font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.reminder-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.reminder-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+  flex-shrink:0;align-self:flex-start;margin-top:2px}
+.badge-today{background:#e87c7c22;color:#e87c7c}
+.badge-soon{background:var(--crescent);color:#fff;opacity:.9}
+.badge-week{background:var(--blush-deep);color:var(--rose-gold-dark)}
+.badge-done{background:#7ce87c22;color:#5ab85a}
+.badge-overdue{background:#e87c7c;color:#fff}
+
+/* ── Checkbox ── */
+.check-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:7px;
+  transition:border-color var(--transition),background var(--transition);font-size:12px;cursor:pointer}
+.check-circle.checked{border-color:var(--rose-gold);background:var(--rose-gold);color:#fff}
+
+/* ── Category chips ── */
+.sticky-cats{position:sticky;top:57px;background:var(--bg);z-index:50;border-bottom:1px solid var(--border);padding-bottom:6px}
+.cat-chips{padding:10px 20px 4px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.cat-chips::-webkit-scrollbar{display:none}
+.cat-chip{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;
+  font-family:var(--font-body);transition:all var(--transition);white-space:nowrap}
+.cat-chip.active{background:var(--rose-gold);border-color:var(--rose-gold);color:#fff;
+  box-shadow:0 2px 8px rgba(201,149,107,.3)}
+
+/* ── Sort bar ── */
+.sort-bar{display:flex;align-items:center;gap:8px;padding:8px 16px 0;font-size:12px;color:var(--muted)}
+.sort-btn{background:none;border:none;cursor:pointer;font-family:var(--font-body);
+  font-size:12px;color:var(--muted);font-weight:600;padding:4px 8px;border-radius:8px;
+  transition:all var(--transition)}
+.sort-btn.active{color:var(--rose-gold);background:var(--card)}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state .es-icon{font-size:40px;margin-bottom:10px}
+.empty-state p{font-size:14px}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:88px;right:20px;width:50px;height:50px;
+  background:linear-gradient(135deg,var(--rose-gold),var(--crescent));border:none;
+  border-radius:14px;color:#fff;font-size:22px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(201,149,107,.45);display:flex;align-items:center;justify-content:center;
+  z-index:99;transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow var(--transition),opacity .3s}
+.fab:active{transform:scale(.93)}
+.fab.hidden{transform:translateY(80px);opacity:0;pointer-events:none}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:430px;
+  padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:92dvh;overflow-y:auto}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:18px;color:var(--text)}
+
+/* ── Form elements ── */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;display:block;margin-bottom:6px}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:11px 14px;font-family:var(--font-body);font-size:14px;
+  color:var(--text);outline:none;transition:border-color var(--transition);appearance:none;-webkit-appearance:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--rose-gold)}
+.form-textarea{resize:vertical;min-height:72px}
+.form-select option{background:var(--card);color:var(--text)}
+.priority-row{display:flex;gap:8px}
+.priority-btn{flex:1;padding:9px 4px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:transparent;font-family:var(--font-body);font-size:12px;font-weight:700;
+  cursor:pointer;color:var(--muted);transition:all var(--transition)}
+.priority-btn.sel-urgent{border-color:#e87c7c;background:#e87c7c22;color:#e87c7c}
+.priority-btn.sel-normal{border-color:var(--rose-gold);background:rgba(201,149,107,.15);color:var(--rose-gold)}
+.priority-btn.sel-low{border-color:var(--muted);background:var(--card);color:var(--muted)}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:2px}
+.cat-grid-btn{padding:8px 4px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:transparent;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;
+  color:var(--muted);text-align:center;transition:all var(--transition);display:flex;
+  flex-direction:column;align-items:center;gap:3px}
+.cat-grid-btn .cg-icon{font-size:18px}
+.cat-grid-btn.selected{border-color:var(--rose-gold);background:rgba(201,149,107,.15);color:var(--rose-gold)}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--rose-gold),var(--crescent));
+  border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font-body);
+  font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;
+  transition:opacity var(--transition);letter-spacing:.2px}
+.btn-primary:active{opacity:.85}
+.btn-secondary{width:100%;padding:12px;background:transparent;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--muted);font-family:var(--font-body);
+  font-size:14px;font-weight:600;cursor:pointer;margin-top:6px}
+
+/* ── Finance ── */
+.finance-section{padding:0 16px}
+.finance-group{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.finance-group-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.fgroup-icon{font-size:18px} .fgroup-title{font-weight:700;font-size:14px;flex:1}
+.fgroup-count{font-size:11px;color:var(--muted)} .fgroup-chevron{font-size:14px;color:var(--muted);transition:transform var(--transition)}
+.finance-group.open .fgroup-chevron{transform:rotate(180deg)}
+.finance-items{display:none}.finance-group.open .finance-items{display:block}
+.finance-item{padding:10px 16px 10px 46px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.finance-item-name{flex:1;font-size:13px;font-weight:500}
+.finance-item-due{font-size:11px;color:var(--muted)}
+.finance-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.status-due{background:#e87c7c22;color:#e87c7c} .status-ok{background:#7ce87c22;color:#5ab85a}
+.status-soon{background:var(--crescent);color:#fff;opacity:.85} .status-pending{background:var(--blush-deep);color:var(--rose-gold-dark)}
+
+/* ── Calendar ── */
+.calendar-wrap{padding:0 16px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px}
+.cal-month{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text)}
+.cal-nav{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;
+  width:32px;height:32px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day-name{text-align:center;font-size:10px;font-weight:700;color:var(--muted);padding:4px 0;
+  text-transform:uppercase;letter-spacing:.5px}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:8px;font-size:13px;font-weight:500;color:var(--text);position:relative;cursor:pointer;
+  transition:background var(--transition);gap:2px}
+.cal-day.other-month{color:var(--border)}
+.cal-day.today{background:var(--rose-gold);color:#fff;font-weight:700}
+.cal-day.has-event::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--crescent);
+  position:absolute;bottom:3px}
+.cal-day.today.has-event::after{background:#fff}
+.cal-day.ph{color:#e87c7c;font-weight:700}
+
+/* ── School term ── */
+.school-term{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 16px;margin-bottom:8px}
+.term-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.term-badge{background:var(--rose-gold);color:#fff;border-radius:8px;padding:4px 10px;
+  font-size:11px;font-weight:700;flex-shrink:0}
+.term-name{font-weight:700;font-size:14px} .term-dates{font-size:12px;color:var(--muted)}
+.holiday-pill{display:inline-flex;align-items:center;gap:4px;background:var(--blush);
+  color:var(--rose-gold-dark);border-radius:20px;padding:3px 10px;font-size:11px;
+  font-weight:600;margin:2px 3px 2px 0}
+[data-theme="light"] .holiday-pill{background:var(--blush-deep)}
+.ph-chip{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px}
+.ph-chip-date{font-size:12px;font-weight:700;color:var(--rose-gold);width:80px;flex-shrink:0}
+.ph-chip-name{font-size:13px;font-weight:500;flex:1}
+.ph-chip-state{font-size:10px;color:var(--muted);background:var(--border);padding:2px 7px;border-radius:10px;flex-shrink:0}
+
+/* ── Kids ── */
+.kid-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px}
+.kid-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.kid-avatar{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;background:linear-gradient(135deg,var(--blush-deep),var(--rose-gold-light));flex-shrink:0}
+.kid-name{font-family:var(--font-display);font-size:18px;font-weight:700}
+.kid-age{font-size:12px;color:var(--muted)}
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.progress-label{font-size:12px;font-weight:600;flex:1}
+.progress-bar-wrap{flex:2;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;background:var(--rose-gold);transition:width .5s ease}
+.progress-pct{font-size:11px;color:var(--muted);width:32px;text-align:right}
+.vax-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.vax-item:last-child{border-bottom:none}
+.vax-check{font-size:15px;flex-shrink:0} .vax-name{font-size:13px;flex:1} .vax-date{font-size:11px;color:var(--muted)}
+
+/* ── Meals ── */
+.meal-day{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
+.meal-day-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.meal-day-name{font-weight:700;font-size:14px} .meal-day-date{font-size:11px;color:var(--muted)}
+.meal-slot{display:flex;align-items:center;gap:10px;padding:5px 0}
+.meal-slot-label{font-size:11px;font-weight:700;color:var(--muted);width:52px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.meal-slot-value{font-size:13px;color:var(--text)}
+.meal-slot-empty{font-size:13px;color:var(--border);font-style:italic}
+
+/* ── Toggle ── */
+.toggle{width:44px;height:26px;background:var(--border);border-radius:13px;position:relative;
+  cursor:pointer;transition:background var(--transition);flex-shrink:0;border:none}
+.toggle.on{background:var(--rose-gold)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;
+  border-radius:50%;transition:transform var(--transition);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(18px)}
+
+/* ── Profile card ── */
+.profile-card{margin:16px;background:linear-gradient(135deg,var(--rose-gold-dark),var(--rose-gold) 60%,var(--crescent));
+  border-radius:var(--radius);padding:20px;color:#fff;display:flex;align-items:center;gap:16px}
+.profile-avatar{width:56px;height:56px;background:rgba(255,255,255,.25);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.profile-name{font-family:var(--font-display);font-size:20px;font-weight:700}
+.profile-title{font-size:12px;opacity:.8;margin-top:2px}
+
+/* ── Settings ── */
+.settings-section{padding:0 16px;margin-bottom:16px}
+.settings-group{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.settings-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background var(--transition)}
+.settings-row:last-child{border-bottom:none}
+.settings-row:active{background:var(--border)}
+.settings-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.settings-label{flex:1;font-size:14px;font-weight:500}
+.settings-value{font-size:12px;color:var(--muted)} .settings-arrow{font-size:14px;color:var(--muted)}
+.settings-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+  padding:10px 14px;font-family:var(--font-body);font-size:13px;color:var(--text);
+  outline:none;margin-top:8px;transition:border-color var(--transition)}
+.settings-input:focus{border-color:var(--rose-gold)}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--text);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;
+  font-weight:600;z-index:300;opacity:0;transition:opacity .3s,transform .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Completed archive ── */
+.archive-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 14px;display:flex;align-items:center;gap:10px;opacity:.55;margin-bottom:6px}
+.archive-item .arc-title{font-size:13px;font-weight:600;text-decoration:line-through;flex:1}
+.archive-item .arc-date{font-size:11px;color:var(--muted)}
+.arc-restore{background:none;border:none;color:var(--rose-gold);font-size:11px;font-weight:700;cursor:pointer;padding:2px 6px}
+
+/* ── Taska widget ── */
+.taska-widget{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;display:flex;align-items:center;gap:12px}
+.taska-icon{width:36px;height:36px;border-radius:10px;background:#7cb8e822;display:flex;
+  align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+@media(max-width:380px){.brand-text{font-size:15px}.date-num{font-size:32px}.summary-num{font-size:22px}}
 </style>
 </head>
 <body data-theme="dark">
-
-<!-- App Shell -->
 <div id="app">
 
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-brand">
-      <div class="brand-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Lotus / flower icon -->
-          <path d="M12 2C12 2 9 6 9 10C9 11.66 9.67 13.16 10.76 14.24C9.68 13.15 8.18 12.5 6.5 12.5C3.5 12.5 1 15 1 15C1 15 3.5 17.5 6.5 17.5C8.18 17.5 9.68 16.85 10.76 15.76C9.67 16.84 9 18.34 9 20H15C15 18.34 14.33 16.84 13.24 15.76C14.32 16.85 15.82 17.5 17.5 17.5C20.5 17.5 23 15 23 15C23 15 20.5 12.5 17.5 12.5C15.82 12.5 14.32 13.15 13.24 14.24C14.33 13.16 15 11.66 15 10C15 6 12 2 12 2Z" fill="white" opacity="0.95"/>
-        </svg>
-      </div>
+<!-- Offline banner -->
+<div class="offline-banner" id="offlineBanner">📵 You're offline — showing cached data. AI nudges paused.</div>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="header-brand">
+    <div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 9 6 9 10C9 11.66 9.67 13.16 10.76 14.24C9.68 13.15 8.18 12.5 6.5 12.5C3.5 12.5 1 15 1 15C1 15 3.5 17.5 6.5 17.5C8.18 17.5 9.68 16.85 10.76 15.76C9.67 16.84 9 18.34 9 20H15C15 18.34 14.33 16.84 13.24 15.76C14.32 16.85 15.82 17.5 17.5 17.5C20.5 17.5 23 15 23 15C23 15 20.5 12.5 17.5 12.5C15.82 12.5 14.32 13.15 13.24 14.24C14.33 13.16 15 11.66 15 10C15 6 12 2 12 2Z" fill="white" opacity="0.95"/></svg>
+    </div>
+    <div>
+      <div class="brand-text">Mommy Reminder Hub</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="sync-dot" id="syncDot" title="Sync status"></span>
+    <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main class="main-content" id="mainContent">
+
+  <!-- ═══════════ TODAY ═══════════ -->
+  <section class="page active" id="page-today">
+
+    <div class="date-strip">
       <div>
-        <div class="brand-text">Mommy Reminder Hub</div>
+        <div class="date-big" id="todayDayName">Loading…</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="todayFullDate"></div>
+      </div>
+      <div class="date-num" id="todayDayNum">--</div>
+    </div>
+
+    <!-- Taska quick check-in -->
+    <div style="padding:10px 16px 0;">
+      <div class="taska-widget">
+        <div class="taska-icon">🏡</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:13px;">Miki — Taska Di Rumah Ayu</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px;" id="taskaStatusToday">Not dropped off yet today</div>
+        </div>
+        <button class="toggle" id="taskaToggleToday" onclick="toggleTaskaToday()"></button>
       </div>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+
+    <!-- Summary row -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-num" style="color:#e87c7c;" id="sumUrgent">0</div>
+        <div class="summary-label">Urgent</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" id="sumWeek">0</div>
+        <div class="summary-label">This Week</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" style="color:var(--crescent);" id="sumBirthdays">0</div>
+        <div class="summary-label">Birthdays</div>
+      </div>
     </div>
-  </header>
 
-  <!-- Main -->
-  <main class="main-content">
-
-    <!-- ═══════════════════════════ TODAY ═══════════════════════════ -->
-    <section class="page active" id="page-today">
-
-      <div class="date-strip">
-        <div>
-          <div class="date-big">Tuesday — Kuala Lumpur</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">24 March 2026</div>
-        </div>
-        <div class="date-num">24</div>
-      </div>
-
-      <!-- Taska quick check-in -->
-      <div style="padding:10px 16px 0;">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;">
-          <div style="width:36px;height:36px;border-radius:10px;background:#7cb8e822;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏡</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:13px;">Miki — Taska Di Rumah Ayu</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:1px;" id="taskaStatusToday">Not dropped off yet today</div>
-          </div>
-          <button class="toggle" id="taskaToggleToday" onclick="toggleTaskaToday()" style="flex-shrink:0;"></button>
+    <!-- AI Nudges -->
+    <div class="section-head">
+      <div class="section-title">✨ AI Nudges</div>
+      <span class="section-link" id="nudgeRefreshBtn" onclick="loadNudges(true)">Refresh</span>
+    </div>
+    <div class="nudge-wrap">
+      <div class="nudge-scroll" id="nudgeScroll">
+        <div class="nudge-card loading">
+          <div class="nudge-loading"><div class="nudge-spinner"></div>Loading nudges…</div>
         </div>
       </div>
+    </div>
 
-      <!-- Summary row -->
-      <div class="summary-row">
-        <div class="summary-card">
-          <div class="summary-num" style="color:#e87c7c;">3</div>
-          <div class="summary-label">Urgent</div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-num">8</div>
-          <div class="summary-label">This Week</div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-num" style="color:var(--crescent);">2</div>
-          <div class="summary-label">Birthdays</div>
-        </div>
+    <!-- Today's reminders -->
+    <div class="section-head">
+      <div class="section-title">Today's Reminders</div>
+      <span class="section-link" onclick="showPage('reminders')">All →</span>
+    </div>
+    <div class="reminder-list" id="todayList"></div>
+
+    <!-- Coming up soon -->
+    <div class="section-head" style="padding-top:16px;">
+      <div class="section-title">Coming Up Soon</div>
+    </div>
+    <div class="reminder-list" style="padding-bottom:8px;" id="upcomingList"></div>
+
+  </section>
+
+  <!-- ═══════════ REMINDERS ═══════════ -->
+  <section class="page" id="page-reminders">
+    <div class="section-head">
+      <div class="section-title">All Reminders</div>
+      <span class="section-link" onclick="openAddModal()">+ Add</span>
+    </div>
+
+    <div class="sticky-cats">
+      <div class="cat-chips" id="catChips">
+        <button class="cat-chip active" data-cat="all" onclick="setFilter(this,'all')">All</button>
+        <button class="cat-chip" data-cat="work" onclick="setFilter(this,'work')">💻 Work</button>
+        <button class="cat-chip" data-cat="finance" onclick="setFilter(this,'finance')">💰 Finance</button>
+        <button class="cat-chip" data-cat="school" onclick="setFilter(this,'school')">🏫 School</button>
+        <button class="cat-chip" data-cat="birthday" onclick="setFilter(this,'birthday')">🎂 Birthday</button>
+        <button class="cat-chip" data-cat="health" onclick="setFilter(this,'health')">💊 Health</button>
+        <button class="cat-chip" data-cat="holiday" onclick="setFilter(this,'holiday')">🕌 Holiday</button>
+        <button class="cat-chip" data-cat="pubhol" onclick="setFilter(this,'pubhol')">🇲🇾 PH</button>
+        <button class="cat-chip" data-cat="grocery" onclick="setFilter(this,'grocery')">🛒 Grocery</button>
+        <button class="cat-chip" data-cat="home" onclick="setFilter(this,'home')">🏠 Home</button>
+        <button class="cat-chip" data-cat="selfcare" onclick="setFilter(this,'selfcare')">🌸 Self-Care</button>
+        <button class="cat-chip" data-cat="meals" onclick="setFilter(this,'meals')">🍽️ Meals</button>
       </div>
-
-      <!-- AI Nudges -->
-      <div class="section-head">
-        <div class="section-title">✨ AI Nudges</div>
-        <span class="section-link">Refresh</span>
+      <div class="sort-bar">
+        <span style="color:var(--muted);font-weight:600;">Sort:</span>
+        <button class="sort-btn active" id="sortDue" onclick="setSort('due')">Due date</button>
+        <button class="sort-btn" id="sortPri" onclick="setSort('priority')">Priority</button>
+        <button class="sort-btn" id="sortCat" onclick="setSort('category')">Category</button>
       </div>
+    </div>
 
-      <div class="nudge-wrap">
-      <div class="nudge-scroll">
-        <div class="nudge-card">
-          <div class="nudge-emoji">🎂</div>
-          <div class="nudge-text">Lisa's birthday is in 18 days! Time to start planning her 5th birthday party. Where's her favourite place — Animax Kidz?</div>
-          <div class="nudge-tag">Birthday 🎉</div>
+    <div style="height:10px;"></div>
+    <div class="reminder-list" id="reminderList"></div>
+    <div id="reminderEmpty" class="empty-state" style="display:none;">
+      <div class="es-icon">🌸</div>
+      <p>No reminders in this category.<br>Tap <strong>+ Add</strong> to create one.</p>
+    </div>
+
+    <!-- Completed archive toggle -->
+    <div style="padding:16px 16px 0;">
+      <button onclick="toggleArchive()" style="background:none;border:none;color:var(--muted);
+        font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;
+        display:flex;align-items:center;gap:6px;" id="archiveToggleBtn">
+        📦 Completed Archive (<span id="archiveCount">0</span>)
+        <span id="archiveChevron">▸</span>
+      </button>
+    </div>
+    <div id="archiveList" style="padding:8px 16px;display:none;"></div>
+
+  </section>
+
+  <!-- ═══════════ FINANCE ═══════════ -->
+  <section class="page" id="page-finance">
+    <div class="section-head">
+      <div class="section-title">Finance & Bills</div>
+    </div>
+    <div class="finance-section">
+
+      <div class="finance-group open">
+        <div class="finance-group-header" onclick="toggleGroup(this)">
+          <div class="fgroup-icon">🏠</div><div class="fgroup-title">Property & Vehicle</div>
+          <div class="fgroup-count">3 items</div><div class="fgroup-chevron">▾</div>
         </div>
-        <div class="nudge-card" style="background:linear-gradient(135deg,#5a7cb8,#7c9ee8);">
-          <div class="nudge-emoji">💊</div>
-          <div class="nudge-text">Have you bought your supplements this month? Don't forget your self-care routine — Mommy kena jaga diri dulu!</div>
-          <div class="nudge-tag">Self-Care 🌸</div>
-        </div>
-        <div class="nudge-card" style="background:linear-gradient(135deg,#5a8a5a,#7cb87c);">
-          <div class="nudge-emoji">📝</div>
-          <div class="nudge-text">SNOW Knowledge Base contribution deadline is end of March. Have you drafted your KB article this month?</div>
-          <div class="nudge-tag">Work 💻</div>
-        </div>
-        <div class="nudge-card" style="background:linear-gradient(135deg,#8a5a5a,#c47c7c);">
-          <div class="nudge-emoji">💰</div>
-          <div class="nudge-text">Mortgage Mawar is due before the 4th. Only 11 days left — make sure funds are ready in the account.</div>
-          <div class="nudge-tag">Finance 💳</div>
-        </div>
-        <div class="nudge-card" style="background:linear-gradient(135deg,#7a5a8a,#c47ce8);">
-          <div class="nudge-emoji">💅</div>
-          <div class="nudge-text">When did you last have a proper me-time? Plan something small this weekend — gym, spa, or even just a quiet coffee alone ☕</div>
-          <div class="nudge-tag">Self-Care 🌸</div>
-        </div>
-        <div class="nudge-card" style="background:linear-gradient(135deg,#4a7a6a,#6ab8a0);">
-          <div class="nudge-emoji">🕌</div>
-          <div class="nudge-text">Hari Raya Aidilfitri is in ~6 days! Have you bought baju raya, kuih, and prepared lemang for breakfast? Don't forget duit raya!</div>
-          <div class="nudge-tag">Holiday 🌙</div>
-        </div>
-      </div>
-      </div>
-
-      <!-- Today's reminders -->
-      <div class="section-head">
-        <div class="section-title">Today's Reminders</div>
-        <span class="section-link">All →</span>
-      </div>
-
-      <div class="reminder-list">
-
-        <div class="reminder-card urgent" onclick="toggleDone(this)">
-          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e87c7c22;color:#e87c7c;">💰</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Mortgage Plaza KJ — Auto Deduct</div>
-            <div class="reminder-sub">1st of month • Auto deducted today</div>
-          </div>
-          <div class="reminder-badge badge-today">Today</div>
-        </div>
-
-        <div class="reminder-card urgent" onclick="toggleDone(this)">
-          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#7ce8c422;color:#7ce8c4;">💻</div>
-          <div class="reminder-body">
-            <div class="reminder-title">SNOW Knowledge Base Contribution</div>
-            <div class="reminder-sub">Monthly KPI • Due end of March</div>
-          </div>
-          <div class="reminder-badge badge-today">This Month</div>
-        </div>
-
-        <div class="reminder-card soon" onclick="toggleDone(this)">
-          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e8d47c22;color:#e8d47c;">🎂</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Syabil's Birthday</div>
-            <div class="reminder-sub">8 March — passed! Did you celebrate? 🎉</div>
-          </div>
-          <div class="reminder-badge badge-week">Passed</div>
-        </div>
-
-        <div class="reminder-card" onclick="toggleDone(this)">
-          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#c47ce822;color:#c47ce8;">🌸</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Gym Session</div>
-            <div class="reminder-sub">Membership active • Schedule your next visit</div>
-          </div>
-          <div class="reminder-badge badge-week">Self-Care</div>
-        </div>
-
-        <div class="reminder-card" onclick="toggleDone(this)">
-          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#7cb8e822;color:#7cb8e8;">🏫</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Lisa — SJK(C) Sentul Enrolment Prep</div>
-            <div class="reminder-sub">January 2027 intake • ~9 months to go</div>
-          </div>
-          <div class="reminder-badge badge-week">School</div>
-        </div>
-
-      </div>
-
-      <!-- Upcoming this week -->
-      <div class="section-head" style="padding-top:16px;">
-        <div class="section-title">Coming Up Soon</div>
-      </div>
-
-      <div class="reminder-list" style="padding-bottom:8px;">
-
-        <div class="reminder-card">
-          <div class="cat-dot" style="background:#e87c7c22;color:#e87c7c;">💳</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Mortgage Mawar — Pay Before 4th</div>
-            <div class="reminder-sub">Finance • 11 days left</div>
-          </div>
-          <div class="reminder-badge" style="background:var(--crescent);color:#fff;">11d</div>
-        </div>
-
-        <div class="reminder-card">
-          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Lisa's Birthday 🎂</div>
-            <div class="reminder-sub">12 March → 12 April is next year</div>
-          </div>
-          <div class="reminder-badge badge-week">April</div>
-        </div>
-
-        <div class="reminder-card">
-          <div class="cat-dot" style="background:#7ce87c22;color:#5ab85a;">🕌</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Eid al-Fitr (Hari Raya Aidilfitri)</div>
-            <div class="reminder-sub">~30 March 2025 • Check lemang, kuih prep</div>
-          </div>
-          <div class="reminder-badge badge-soon">~6d</div>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- ═══════════════════════════ REMINDERS ═══════════════════════════ -->
-    <section class="page" id="page-reminders">
-
-      <div class="section-head">
-        <div class="section-title">All Reminders</div>
-        <span class="section-link" onclick="showAddModal()">+ Add</span>
-      </div>
-
-      <!-- Category filter chips -->
-      <div class="sticky-cats">
-        <div class="cat-chips">
-          <button class="cat-chip active" onclick="filterCat(this,'all')">All</button>
-          <button class="cat-chip" onclick="filterCat(this,'work')">💻 Work</button>
-          <button class="cat-chip" onclick="filterCat(this,'finance')">💰 Finance</button>
-          <button class="cat-chip" onclick="filterCat(this,'school')">🏫 School</button>
-          <button class="cat-chip" onclick="filterCat(this,'birthday')">🎂 Birthday</button>
-          <button class="cat-chip" onclick="filterCat(this,'health')">💊 Health</button>
-          <button class="cat-chip" onclick="filterCat(this,'holiday')">🕌 Holiday</button>
-          <button class="cat-chip" onclick="filterCat(this,'pubhol')">🇲🇾 PH</button>
-          <button class="cat-chip" onclick="filterCat(this,'grocery')">🛒 Grocery</button>
-          <button class="cat-chip" onclick="filterCat(this,'home')">🏠 Home</button>
-          <button class="cat-chip" onclick="filterCat(this,'selfcare')">🌸 Self-Care</button>
-          <button class="cat-chip" onclick="filterCat(this,'meals')">🍽️ Meals</button>
+        <div class="finance-items">
+          <div class="finance-item"><div class="finance-item-name">Mortgage Plaza KJ</div><div class="finance-item-due">Auto deduct 1st</div><div class="finance-status status-ok">✓ Auto</div></div>
+          <div class="finance-item"><div class="finance-item-name">Mortgage Mawar</div><div class="finance-item-due">Pay before 4th</div><div class="finance-status status-soon" id="mawarStatus">Check</div></div>
+          <div class="finance-item"><div class="finance-item-name">Hire Purchase Alphard</div><div class="finance-item-due">Monthly auto</div><div class="finance-status status-ok">✓ Auto</div></div>
         </div>
       </div>
 
-      <div style="height:10px;"></div>
-
-      <!-- Work reminders -->
-      <div style="padding: 0 16px 6px; font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Work</div>
-      <div class="reminder-list">
-        <div class="reminder-card" data-cat="work">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#7c9ee822;color:#7c9ee8;">💻</div>
-          <div class="reminder-body">
-            <div class="reminder-title">SNOW Knowledge Base Contribution</div>
-            <div class="reminder-sub">Monthly KPI • Due end of March</div>
-          </div>
-          <div class="reminder-badge badge-today">KPI</div>
+      <div class="finance-group open">
+        <div class="finance-group-header" onclick="toggleGroup(this)">
+          <div class="fgroup-icon">🏢</div><div class="fgroup-title">Plaza KJ Utilities</div>
+          <div class="fgroup-count">5 items</div><div class="fgroup-chevron">▾</div>
         </div>
-        <div class="reminder-card" data-cat="work">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#7c9ee822;color:#7c9ee8;">🔧</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Oracle Linux 8 Security Patching</div>
-            <div class="reminder-sub">Monthly • Date TBD — add manually when scheduled</div>
-          </div>
-          <div class="reminder-badge badge-week">Manual</div>
-        </div>
-        <div class="reminder-card" data-cat="work">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#7c9ee822;color:#7c9ee8;">📋</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Audit Prep Review</div>
-            <div class="reminder-sub">Add date manually when scheduled</div>
-          </div>
-          <div class="reminder-badge badge-week">Manual</div>
+        <div class="finance-items">
+          <div class="finance-item"><div class="finance-item-name">Late & Service Charge + Sinking Fund</div><div class="finance-item-due">Monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Plaza KJ Water</div><div class="finance-item-due">Monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Plaza KJ Electricity (TNB)</div><div class="finance-item-due">Bill out 23rd</div><div class="finance-status" id="tnbKjStatus">Check</div></div>
+          <div class="finance-item"><div class="finance-item-name">Plaza KJ IWK</div><div class="finance-item-due">Monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Plaza KJ Unifi Home</div><div class="finance-item-due">Bill out ~22nd</div><div class="finance-status" id="unifiStatus">Check</div></div>
         </div>
       </div>
 
-      <!-- Birthday reminders -->
-      <div style="padding: 14px 16px 6px; font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Birthdays</div>
-      <div class="reminder-list">
-        <div class="reminder-card done" data-cat="birthday">
-          <div class="check-circle checked" onclick="toggleCheck(this)">✓</div>
-          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Thomas's Birthday 🎉</div>
-            <div class="reminder-sub">12 February • Arrange dinner or buy cake</div>
-          </div>
+      <div class="finance-group">
+        <div class="finance-group-header" onclick="toggleGroup(this)">
+          <div class="fgroup-icon">🌹</div><div class="fgroup-title">Mawar Utilities</div>
+          <div class="fgroup-count">2 items</div><div class="fgroup-chevron">▾</div>
+        </div>
+        <div class="finance-items">
+          <div class="finance-item"><div class="finance-item-name">Late & Service Charge + Sinking Fund</div><div class="finance-item-due">Monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Mawar Electricity (TNB)</div><div class="finance-item-due">Bill out 23rd</div><div class="finance-status" id="tnbMawarStatus">Check</div></div>
+        </div>
+      </div>
+
+      <div class="finance-group">
+        <div class="finance-group-header" onclick="toggleGroup(this)">
+          <div class="fgroup-icon">📱</div><div class="fgroup-title">Subscriptions & Mobile</div>
+          <div class="fgroup-count">9 items</div><div class="fgroup-chevron">▾</div>
+        </div>
+        <div class="finance-items">
+          <div class="finance-item"><div class="finance-item-name">CelcomDigi Postpaid</div><div class="finance-item-due">Bill out 24th</div><div class="finance-status" id="celcomStatus">Check</div></div>
+          <div class="finance-item"><div class="finance-item-name">TnG eWallet Top-up</div><div class="finance-item-due">25th monthly</div><div class="finance-status" id="tngStatus">Check</div></div>
+          <div class="finance-item"><div class="finance-item-name">Apple Music (TnG)</div><div class="finance-item-due">21st monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">iCloud+ (TnG)</div><div class="finance-item-due">10th monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">StrengthLog (TnG)</div><div class="finance-item-due">Every 3 months</div><div class="finance-status status-pending">Next: May</div></div>
+          <div class="finance-item"><div class="finance-item-name">Claude Pro (CIMB Debit)</div><div class="finance-item-due">20th monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Clue (TnG) — Yearly</div><div class="finance-item-due">20 Jan annually</div><div class="finance-status status-ok">✓ '26</div></div>
+          <div class="finance-item"><div class="finance-item-name">Cryptomator (TnG) — Yearly</div><div class="finance-item-due">15 Nov annually</div><div class="finance-status status-pending">Nov</div></div>
+        </div>
+      </div>
+
+      <div class="finance-group">
+        <div class="finance-group-header" onclick="toggleGroup(this)">
+          <div class="fgroup-icon">👨‍👩‍👧‍👦</div><div class="fgroup-title">Family & Savings</div>
+          <div class="fgroup-count">4 items</div><div class="fgroup-chevron">▾</div>
+        </div>
+        <div class="finance-items">
+          <div class="finance-item"><div class="finance-item-name">Taska (Miki)</div><div class="finance-item-due">Monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Gym Membership</div><div class="finance-item-due">1st monthly auto</div><div class="finance-status status-ok">✓ Auto</div></div>
+          <div class="finance-item"><div class="finance-item-name">Umi (Monthly)</div><div class="finance-item-due">Monthly</div><div class="finance-status status-ok">✓</div></div>
+          <div class="finance-item"><div class="finance-item-name">Assessment Tax</div><div class="finance-item-due">1st March annually</div><div class="finance-status status-ok">✓ Paid</div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════ CALENDAR ═══════════ -->
+  <section class="page" id="page-calendar">
+    <div class="calendar-wrap">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="calPrev()">‹</button>
+        <div class="cal-month" id="calTitle">March 2026</div>
+        <button class="cal-nav" onclick="calNext()">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <div class="section-head"><div class="section-title">📚 School Calendar 2026</div></div>
+    <div style="padding:0 16px;">
+      <div class="school-term"><div class="term-header"><div class="term-badge">Term 1</div><div><div class="term-name">Penggal 1, 2026</div><div class="term-dates">2 Jan – 14 Mar 2026 ✓</div></div></div><div><span class="holiday-pill">🌙 Israk Mikraj: 27 Jan</span><span class="holiday-pill">✨ CNY: 29–30 Jan</span><span class="holiday-pill">🌸 Thaipusam: 11 Feb</span></div></div>
+      <div class="school-term" style="border:1.5px solid var(--rose-gold)"><div class="term-header"><div class="term-badge" style="background:var(--crescent)">Break 1</div><div><div class="term-name">Mid-term Break 1 ← Now</div><div class="term-dates">15 – 23 Mar 2026</div></div></div><div><span class="holiday-pill">🕌 Raya ~30 Mar</span></div></div>
+      <div class="school-term"><div class="term-header"><div class="term-badge">Term 2</div><div><div class="term-name">Penggal 2, 2026</div><div class="term-dates">24 Mar – 30 May 2026</div></div></div><div><span class="holiday-pill">🎂 Miki B'day: 2 May</span><span class="holiday-pill">⭐ Wesak: 12 May</span></div></div>
+      <div class="school-term"><div class="term-header"><div class="term-badge">Break 2</div><div><div class="term-name">Mid-term Break 2</div><div class="term-dates">31 May – 14 Jun 2026</div></div></div></div>
+      <div class="school-term"><div class="term-header"><div class="term-badge">Term 3</div><div><div class="term-name">Penggal 3, 2026</div><div class="term-dates">15 Jun – 22 Aug 2026</div></div></div><div><span class="holiday-pill">🇲🇾 Merdeka: 31 Aug</span></div></div>
+      <div class="school-term"><div class="term-header"><div class="term-badge">Break 3</div><div><div class="term-name">Mid-term Break 3</div><div class="term-dates">23 Aug – 6 Sep 2026</div></div></div></div>
+      <div class="school-term"><div class="term-header"><div class="term-badge">Term 4</div><div><div class="term-name">Penggal 4, 2026</div><div class="term-dates">7 Sep – 14 Nov 2026</div></div></div><div><span class="holiday-pill">🇲🇾 Malaysia Day: 16 Sep</span><span class="holiday-pill">🌙 Deepavali: 20 Oct</span></div></div>
+      <div class="school-term"><div class="term-header"><div class="term-badge">Break 4</div><div><div class="term-name">Year-end Holidays</div><div class="term-dates">15 Nov – 31 Dec 2026</div></div></div><div><span class="holiday-pill">🎄 Christmas: 25 Dec</span></div></div>
+    </div>
+
+    <div class="section-head" style="padding-top:16px;"><div class="section-title">🏫 Lisa — SJK(C) Sentul 2027</div></div>
+    <div style="padding:0 16px 8px;">
+      <div class="kid-card">
+        <div class="kid-header"><div class="kid-avatar">👧</div><div><div class="kid-name">Lisa</div><div class="kid-age">4 years old • Starts Jan 2027 • ~9 months</div></div></div>
+        <div class="progress-row"><div class="progress-label">Overall Prep</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:20%"></div></div><div class="progress-pct">20%</div></div>
+        <div style="margin-top:10px;">
+          <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">School registration / enrolment</div><div class="vax-date">By Oct 2026</div></div>
+          <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">APDM parent registration</div><div class="vax-date">With school</div></div>
+          <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">Booster vaccinations (pre Year 1)</div><div class="vax-date">2026</div></div>
+          <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">School uniform, bag, stationery</div><div class="vax-date">Dec 2026</div></div>
+          <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">Chinese reading/writing prep</div><div class="vax-date">Ongoing</div></div>
+          <div class="vax-item"><div class="vax-check">✅</div><div class="vax-name">Research SJK(C) Sentul location</div><div class="vax-date">Done ✓</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head" style="padding-top:4px;"><div class="section-title">🇲🇾 Public Holidays 2026</div></div>
+    <div style="padding:0 16px 8px;">
+      <div class="ph-chip"><div class="ph-chip-date">1 Jan</div><div class="ph-chip-name">New Year's Day</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">27 Jan</div><div class="ph-chip-name">Israk Mikraj</div><div class="ph-chip-state">KL/Sel</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">29–30 Jan</div><div class="ph-chip-name">Chinese New Year</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">1 Feb</div><div class="ph-chip-name">Federal Territory Day</div><div class="ph-chip-state">KL</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">11 Feb</div><div class="ph-chip-name">Thaipusam</div><div class="ph-chip-state">KL/Sel</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">~30 Mar</div><div class="ph-chip-name">Hari Raya Aidilfitri</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">1 May</div><div class="ph-chip-name">Labour Day</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">12 May</div><div class="ph-chip-name">Wesak Day</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">7 Jun</div><div class="ph-chip-name">Hari Raya Haji</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">27 Jun</div><div class="ph-chip-name">Awal Muharram</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">31 Aug</div><div class="ph-chip-name">Hari Merdeka</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">16 Sep</div><div class="ph-chip-name">Malaysia Day</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">5 Sep</div><div class="ph-chip-name">Maulidur Rasul</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">20 Oct</div><div class="ph-chip-name">Deepavali</div><div class="ph-chip-state">National</div></div>
+      <div class="ph-chip"><div class="ph-chip-date">25 Dec</div><div class="ph-chip-name">Christmas Day</div><div class="ph-chip-state">National</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FAMILY ═══════════ -->
+  <section class="page" id="page-family">
+    <div class="section-head"><div class="section-title">Family Hub</div></div>
+    <div style="padding:0 16px;">
+
+      <!-- Lisa -->
+      <div class="kid-card">
+        <div class="kid-header"><div class="kid-avatar">👧</div><div><div class="kid-name">Lisa</div><div class="kid-age">4 years old • Birthday: 12 March • SJK(C) Sentul 2027</div></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Vaccinations</div>
+        <div class="vax-item"><div class="vax-check">✅</div><div class="vax-name">MMR Booster (18m)</div><div class="vax-date">Done</div></div>
+        <div class="vax-item"><div class="vax-check">✅</div><div class="vax-name">DTaP Booster (18m)</div><div class="vax-date">Done</div></div>
+        <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">MMR 2nd dose (7y)</div><div class="vax-date">2028</div></div>
+        <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">School pre-entry booster</div><div class="vax-date">Before Jan 2027</div></div>
+        <div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">School Prep</div>
+        <div class="progress-row"><div class="progress-label">SJK(C) Sentul Readiness</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:20%"></div></div><div class="progress-pct">20%</div></div>
+        <div class="progress-row"><div class="progress-label">Chinese Literacy</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:10%;background:var(--crescent)"></div></div><div class="progress-pct">10%</div></div>
+      </div>
+
+      <!-- Miki -->
+      <div class="kid-card">
+        <div class="kid-header"><div class="kid-avatar">👦</div><div><div class="kid-name">Miki</div><div class="kid-age">3 years old • Birthday: 2 May • Taska Di Rumah Ayu</div></div></div>
+        <div class="taska-widget" style="margin-bottom:12px;">
+          <div class="taska-icon">🏡</div>
+          <div style="flex:1;"><div style="font-weight:700;font-size:13px;">Taska Di Rumah Ayu</div><div style="font-size:11px;color:var(--muted);margin-top:1px;" id="taskaStatus">Tap to mark Miki dropped off today</div></div>
+          <button class="toggle" id="taskaToggle" onclick="toggleTaska()"></button>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Vaccinations</div>
+        <div class="vax-item"><div class="vax-check">✅</div><div class="vax-name">MMR Booster (18m)</div><div class="vax-date">Done</div></div>
+        <div class="vax-item"><div class="vax-check">✅</div><div class="vax-name">DTaP Booster (18m)</div><div class="vax-date">Done</div></div>
+        <div class="vax-item"><div class="vax-check">⬜</div><div class="vax-name">Flu Vaccine (annual)</div><div class="vax-date">Annual</div></div>
+      </div>
+
+      <!-- Thomas -->
+      <div class="kid-card">
+        <div class="kid-header"><div class="kid-avatar">💑</div><div><div class="kid-name">Thomas</div><div class="kid-age">Partner • Birthday: 12 February</div></div></div>
+        <div class="reminder-card" style="margin:0 0 8px;border-radius:var(--radius-sm);">
+          <div class="check-circle checked" style="margin-top:7px;">✓</div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
+          <div class="reminder-body"><div class="reminder-title">Thomas's Birthday — 12 Feb</div><div class="reminder-sub">Arrange dinner / buy cake • This year passed ✓</div></div>
           <div class="reminder-badge badge-done">Done</div>
         </div>
-        <div class="reminder-card done" data-cat="birthday">
-          <div class="check-circle checked" onclick="toggleCheck(this)">✓</div>
-          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Syabil's Birthday 🎉</div>
-            <div class="reminder-sub">8 March • Did you celebrate?</div>
-          </div>
+        <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);" onclick="toggleDoneCard(this)">
+          <div class="check-circle" onclick="event.stopPropagation();toggleCheck(this)"></div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🍽️</div>
+          <div class="reminder-body"><div class="reminder-title">Plan Date Night with Thomas</div><div class="reminder-sub">It's been a while — plan something nice 💖</div></div>
+          <div class="reminder-badge badge-week">Soon</div>
+        </div>
+      </div>
+
+      <!-- Syabil -->
+      <div class="kid-card">
+        <div class="kid-header"><div class="kid-avatar">👦</div><div><div class="kid-name">Syabil</div><div class="kid-age">Stepson • Birthday: 8 March</div></div></div>
+        <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
+          <div class="check-circle checked" style="margin-top:7px;">✓</div>
+          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
+          <div class="reminder-body"><div class="reminder-title">Syabil's Birthday — 8 March</div><div class="reminder-sub">Passed this year — did you celebrate? 🎉</div></div>
           <div class="reminder-badge badge-done">Passed</div>
         </div>
-        <div class="reminder-card" data-cat="birthday">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Lisa's Birthday 🎂</div>
-            <div class="reminder-sub">12 March — turning 5! Plan party 🎠</div>
-          </div>
-          <div class="reminder-badge badge-week">19d</div>
-        </div>
-        <div class="reminder-card" data-cat="birthday">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;">🎂</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Miki's Birthday 🎈</div>
-            <div class="reminder-sub">2 May • Turning 4 — plan something fun!</div>
-          </div>
-          <div class="reminder-badge badge-week">39d</div>
+      </div>
+    </div>
+
+    <!-- Meal Planner -->
+    <div class="section-head" style="padding-top:6px;"><div class="section-title">🍽️ This Week's Meals</div><span class="section-link">Edit</span></div>
+    <div style="padding:0 16px 8px;">
+      <div class="meal-day"><div class="meal-day-head"><div class="meal-day-name">Tuesday</div><div class="meal-day-date">24 Mar</div></div><div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-value">Nasi goreng kampung + telur mata</div></div><div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Sup tulang + nasi putih</div></div></div>
+      <div class="meal-day"><div class="meal-day-head"><div class="meal-day-name">Wednesday</div><div class="meal-day-date">25 Mar</div></div><div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-empty">Not planned yet</div></div><div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Ayam masak merah + pucuk paku</div></div></div>
+      <div class="meal-day"><div class="meal-day-head"><div class="meal-day-name">Thursday</div><div class="meal-day-date">26 Mar</div></div><div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-empty">Not planned yet</div></div><div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-empty">Not planned yet</div></div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SETTINGS ═══════════ -->
+  <section class="page" id="page-settings">
+    <div class="profile-card">
+      <div class="profile-avatar">👩‍💻</div>
+      <div><div class="profile-name">Mommy</div><div class="profile-title">KL, Malaysia 🇲🇾</div></div>
+    </div>
+    <div class="settings-section">
+
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:0 4px 8px;">Appearance</div>
+      <div class="settings-group">
+        <div class="settings-row" onclick="toggleTheme()">
+          <div class="settings-icon">🌙</div><div class="settings-label">Dark Mode</div>
+          <button class="toggle on" id="themeToggleSettings" onclick="event.stopPropagation();toggleTheme()"></button>
         </div>
       </div>
 
-      <!-- Health & Home reminders -->
-      <div style="padding: 14px 16px 6px; font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Home Maintenance</div>
-      <div class="reminder-list">
-        <div class="reminder-card" data-cat="home">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e8b87c22;color:#e8b87c;">❄️</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Aircond Service</div>
-            <div class="reminder-sub">Every 3–6 months • Add date manually</div>
-          </div>
-          <div class="reminder-badge badge-week">Manual</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:0 4px 8px;">AI & Sync</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon">🤖</div><div class="settings-label">Anthropic API Key</div>
+          <div class="settings-value" id="apiKeyStatus">Not set</div><div class="settings-arrow">›</div>
         </div>
-        <div class="reminder-card" data-cat="home">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e8b87c22;color:#e8b87c;">💧</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Water Filter Replacement</div>
-            <div class="reminder-sub">Every 3–6 months • Add date manually</div>
-          </div>
-          <div class="reminder-badge badge-week">Manual</div>
+        <div class="settings-row">
+          <div class="settings-icon">☁️</div><div class="settings-label">Google Drive Sync</div>
+          <div class="settings-value">Phase 3</div><div class="settings-arrow">›</div>
         </div>
-        <div class="reminder-card" data-cat="home">
-          <div class="check-circle" onclick="toggleCheck(this)"></div>
-          <div class="cat-dot" style="background:#e8b87c22;color:#e8b87c;">🪲</div>
-          <div class="reminder-body">
-            <div class="reminder-title">Pest Control</div>
-            <div class="reminder-sub">Every 3 months • Add date manually</div>
-          </div>
-          <div class="reminder-badge badge-week">Manual</div>
+      </div>
+      <div style="padding:0 4px 14px;">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;color:var(--text);">🔑 Anthropic API Key</label>
+        <input class="settings-input" type="password" placeholder="sk-ant-api03-…" id="apiKeyInput">
+        <button onclick="saveApiKey()" style="margin-top:8px;width:100%;padding:10px;background:var(--rose-gold);border:none;border-radius:10px;color:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;">Save Key</button>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:0 4px 8px;">Notifications (Telegram)</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon">🤖</div><div class="settings-label">Telegram Bot Token</div>
+          <div class="settings-value" id="tgBotStatus">Not set</div><div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-icon">💬</div><div class="settings-label">Telegram Chat ID</div>
+          <div class="settings-value" id="tgChatStatus">Not set</div><div class="settings-arrow">›</div>
+        </div>
+      </div>
+      <div style="padding:0 4px 14px;">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;color:var(--text);">🤖 Telegram Bot Token</label>
+        <input class="settings-input" type="password" placeholder="123456:ABC-DEF…" id="tgBotInput">
+        <label style="font-size:13px;font-weight:600;display:block;margin:10px 0 4px;color:var(--text);">💬 Telegram Chat ID</label>
+        <input class="settings-input" type="text" placeholder="e.g. 987654321" id="tgChatInput">
+        <button onclick="saveTelegram()" style="margin-top:8px;width:100%;padding:10px;background:var(--rose-gold);border:none;border-radius:10px;color:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;">Save Telegram Settings</button>
+        <div style="margin-top:8px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--muted);line-height:1.6;">
+          <strong style="color:var(--text);">How to set up Telegram:</strong><br>
+          1. Open Telegram → search <strong>@BotFather</strong><br>
+          2. Send <code style="background:var(--border);padding:1px 5px;border-radius:4px;">/newbot</code> → follow prompts → copy your token above<br>
+          3. Message your new bot once, then visit:<br>
+          <code style="background:var(--border);padding:1px 5px;border-radius:4px;word-break:break-all;">api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code><br>
+          4. Copy the <code>chat.id</code> number → paste as Chat ID above<br>
+          5. Add <code>TELEGRAM_BOT_TOKEN</code> + <code>TELEGRAM_CHAT_ID</code> as GitHub repo Secrets
         </div>
       </div>
 
-    </section>
-
-    <!-- ═══════════════════════════ FINANCE ═══════════════════════════ -->
-    <section class="page" id="page-finance">
-
-      <div class="section-head">
-        <div class="section-title">Finance & Bills</div>
-        <span class="section-link">Summary</span>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:0 4px 8px;">Data</div>
+      <div class="settings-group">
+        <div class="settings-row" onclick="exportData()"><div class="settings-icon">📦</div><div class="settings-label">Export Data (JSON)</div><div class="settings-arrow">›</div></div>
+        <div class="settings-row" onclick="document.getElementById('importFile').click()"><div class="settings-icon">📥</div><div class="settings-label">Import Data</div><div class="settings-arrow">›</div></div>
+        <div class="settings-row" onclick="clearAllData()"><div class="settings-icon">🗑️</div><div class="settings-label" style="color:#e87c7c;">Clear All Reminders</div><div class="settings-arrow">›</div></div>
       </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
 
-      <div class="finance-section">
-
-        <!-- Mortgages & Hire Purchase -->
-        <div class="finance-group open">
-          <div class="finance-group-header" onclick="toggleGroup(this)">
-            <div class="fgroup-icon">🏠</div>
-            <div class="fgroup-title">Property & Vehicle</div>
-            <div class="fgroup-count">3 items</div>
-            <div class="fgroup-chevron">▾</div>
-          </div>
-          <div class="finance-items">
-            <div class="finance-item">
-              <div class="finance-item-name">Mortgage Plaza KJ</div>
-              <div class="finance-item-due">Auto deduct 1st</div>
-              <div class="finance-status status-ok">✓ Auto</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Mortgage Mawar</div>
-              <div class="finance-item-due">Pay before 4th Apr</div>
-              <div class="finance-status status-soon">⚡ 11d</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Hire Purchase Alphard</div>
-              <div class="finance-item-due">Monthly auto</div>
-              <div class="finance-status status-ok">✓ Auto</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Plaza KJ Utilities -->
-        <div class="finance-group open">
-          <div class="finance-group-header" onclick="toggleGroup(this)">
-            <div class="fgroup-icon">🏢</div>
-            <div class="fgroup-title">Plaza KJ Utilities</div>
-            <div class="fgroup-count">5 items</div>
-            <div class="fgroup-chevron">▾</div>
-          </div>
-          <div class="finance-items">
-            <div class="finance-item">
-              <div class="finance-item-name">Late & Service Charge + Sinking Fund</div>
-              <div class="finance-item-due">Monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Plaza KJ Water</div>
-              <div class="finance-item-due">Monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Plaza KJ Electricity (TNB)</div>
-              <div class="finance-item-due">Bill out 23rd Mar</div>
-              <div class="finance-status status-due">Bill out</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Plaza KJ IWK</div>
-              <div class="finance-item-due">Monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Plaza KJ Unifi Home</div>
-              <div class="finance-item-due">Bill out ~22nd</div>
-              <div class="finance-status status-due">Bill out</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mawar Utilities -->
-        <div class="finance-group">
-          <div class="finance-group-header" onclick="toggleGroup(this)">
-            <div class="fgroup-icon">🌹</div>
-            <div class="fgroup-title">Mawar Utilities</div>
-            <div class="fgroup-count">2 items</div>
-            <div class="fgroup-chevron">▾</div>
-          </div>
-          <div class="finance-items">
-            <div class="finance-item">
-              <div class="finance-item-name">Late & Service Charge + Sinking Fund</div>
-              <div class="finance-item-due">Monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Mawar Electricity (TNB)</div>
-              <div class="finance-item-due">Bill out 23rd</div>
-              <div class="finance-status status-due">Bill out</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Subscriptions -->
-        <div class="finance-group">
-          <div class="finance-group-header" onclick="toggleGroup(this)">
-            <div class="fgroup-icon">📱</div>
-            <div class="fgroup-title">Subscriptions & Mobile</div>
-            <div class="fgroup-count">9 items</div>
-            <div class="fgroup-chevron">▾</div>
-          </div>
-          <div class="finance-items">
-            <div class="finance-item">
-              <div class="finance-item-name">CelcomDigi Postpaid</div>
-              <div class="finance-item-due">Bill out 24th</div>
-              <div class="finance-status status-due">Bill out</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">TnG eWallet Top-up</div>
-              <div class="finance-item-due">25th monthly</div>
-              <div class="finance-status status-pending">In 1d</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Apple Music (TnG)</div>
-              <div class="finance-item-due">21st monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">iCloud+ (TnG)</div>
-              <div class="finance-item-due">10th monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">StrengthLog (TnG)</div>
-              <div class="finance-item-due">Every 3 months: May next</div>
-              <div class="finance-status status-pending">May</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Claude Pro (CIMB Debit)</div>
-              <div class="finance-item-due">20th monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Clue (TnG) — Yearly</div>
-              <div class="finance-item-due">20 Jan annually</div>
-              <div class="finance-status status-ok">✓ '26</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Cryptomator (TnG) — Yearly</div>
-              <div class="finance-item-due">15 Nov annually</div>
-              <div class="finance-status status-pending">Nov</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Family & Insurance -->
-        <div class="finance-group">
-          <div class="finance-group-header" onclick="toggleGroup(this)">
-            <div class="fgroup-icon">👨‍👩‍👧‍👦</div>
-            <div class="fgroup-title">Family & Savings</div>
-            <div class="fgroup-count">4 items</div>
-            <div class="fgroup-chevron">▾</div>
-          </div>
-          <div class="finance-items">
-            <div class="finance-item">
-              <div class="finance-item-name">Taska (Miki)</div>
-              <div class="finance-item-due">Monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Gym Membership</div>
-              <div class="finance-item-due">1st monthly</div>
-              <div class="finance-status status-ok">✓ Auto</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Umi (Monthly)</div>
-              <div class="finance-item-due">Monthly</div>
-              <div class="finance-status status-ok">✓</div>
-            </div>
-            <div class="finance-item">
-              <div class="finance-item-name">Assessment Tax</div>
-              <div class="finance-item-due">1st March annually</div>
-              <div class="finance-status status-ok">✓ Paid</div>
-            </div>
-          </div>
-        </div>
-
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">
+        Mommy Reminder Hub v2.0 — Phase 2<br>Built with 🌸 &amp; ☽ for a super Mommy in KL
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ═══════════════════════════ CALENDAR ═══════════════════════════ -->
-    <section class="page" id="page-calendar">
+</main>
 
-      <div class="calendar-wrap">
-        <div class="cal-header">
-          <button class="cal-nav" onclick="calPrev()">‹</button>
-          <div class="cal-month" id="calTitle">March 2026</div>
-          <button class="cal-nav" onclick="calNext()">›</button>
-        </div>
-        <div class="cal-grid" id="calGrid">
-          <!-- Days rendered by JS -->
-        </div>
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openAddModal()" title="Add reminder">＋</button>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-today" onclick="showPage('today')"><span class="nav-icon">🏠</span><span>Today</span></button>
+  <button class="nav-item" id="nav-reminders" onclick="showPage('reminders')"><span class="nav-icon">🔔</span><span>Reminders</span><span class="nav-badge" id="reminderBadge" style="display:none">0</span></button>
+  <button class="nav-item" id="nav-finance" onclick="showPage('finance')"><span class="nav-icon">💳</span><span>Finance</span></button>
+  <button class="nav-item" id="nav-calendar" onclick="showPage('calendar')"><span class="nav-icon">📅</span><span>Calendar</span></button>
+  <button class="nav-item" id="nav-family" onclick="showPage('family')"><span class="nav-icon">👨‍👩‍👧</span><span>Family</span></button>
+  <button class="nav-item" id="nav-settings" onclick="showPage('settings')"><span class="nav-icon">⚙️</span><span>Settings</span></button>
+</nav>
+</div>
+
+<!-- ── Add / Edit Reminder Modal ── -->
+<div class="modal-overlay" id="addModal" onclick="closeModalOnOverlay(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">New Reminder</div>
+
+    <div class="form-group">
+      <label class="form-label">Title *</label>
+      <input class="form-input" id="fTitle" placeholder="What do you need to remember?" maxlength="80">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Category *</label>
+      <div class="cat-grid" id="catGrid">
+        <button class="cat-grid-btn" data-cat="work" onclick="selectCat(this)"><span class="cg-icon">💻</span>Work</button>
+        <button class="cat-grid-btn" data-cat="finance" onclick="selectCat(this)"><span class="cg-icon">💰</span>Finance</button>
+        <button class="cat-grid-btn" data-cat="school" onclick="selectCat(this)"><span class="cg-icon">🏫</span>School</button>
+        <button class="cat-grid-btn" data-cat="birthday" onclick="selectCat(this)"><span class="cg-icon">🎂</span>Birthday</button>
+        <button class="cat-grid-btn" data-cat="health" onclick="selectCat(this)"><span class="cg-icon">💊</span>Health</button>
+        <button class="cat-grid-btn" data-cat="holiday" onclick="selectCat(this)"><span class="cg-icon">🕌</span>Holiday</button>
+        <button class="cat-grid-btn" data-cat="grocery" onclick="selectCat(this)"><span class="cg-icon">🛒</span>Grocery</button>
+        <button class="cat-grid-btn" data-cat="home" onclick="selectCat(this)"><span class="cg-icon">🏠</span>Home</button>
+        <button class="cat-grid-btn" data-cat="selfcare" onclick="selectCat(this)"><span class="cg-icon">🌸</span>Self-Care</button>
+        <button class="cat-grid-btn" data-cat="meals" onclick="selectCat(this)"><span class="cg-icon">🍽️</span>Meals</button>
+        <button class="cat-grid-btn" data-cat="pubhol" onclick="selectCat(this)"><span class="cg-icon">🇲🇾</span>Pub. Hol.</button>
+        <button class="cat-grid-btn" data-cat="other" onclick="selectCat(this)"><span class="cg-icon">📌</span>Other</button>
       </div>
+    </div>
 
-      <!-- School Calendar 2026 -->
-      <div class="section-head">
-        <div class="section-title">📚 School Calendar 2026</div>
+    <div class="form-group">
+      <label class="form-label">Priority</label>
+      <div class="priority-row">
+        <button class="priority-btn" data-pri="urgent" onclick="selectPri(this)">🔴 Urgent</button>
+        <button class="priority-btn sel-normal" data-pri="normal" onclick="selectPri(this)">🟡 Normal</button>
+        <button class="priority-btn" data-pri="low" onclick="selectPri(this)">🟢 Low</button>
       </div>
-      <div style="padding:0 16px;">
+    </div>
 
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Term 1</div>
-            <div>
-              <div class="term-name">Penggal 1, 2026</div>
-              <div class="term-dates">2 Jan – 14 Mar 2026 ✓</div>
-            </div>
-          </div>
-          <div>
-            <span class="holiday-pill">🌙 Thaipusam: 11 Feb</span>
-            <span class="holiday-pill">🌙 Israk Mikraj: 27 Jan</span>
-            <span class="holiday-pill">✨ CNY: 29–30 Jan</span>
-          </div>
-        </div>
+    <div class="form-group">
+      <label class="form-label">Due Date & Time</label>
+      <input class="form-input" type="datetime-local" id="fDue">
+    </div>
 
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Break 1</div>
-            <div>
-              <div class="term-name">Mid-term Break 1</div>
-              <div class="term-dates">15 – 23 Mar 2026 ← Current</div>
-            </div>
-          </div>
-          <div>
-            <span class="holiday-pill">🕌 Raya ~30 Mar</span>
-          </div>
-        </div>
+    <div class="form-group">
+      <label class="form-label">Repeat</label>
+      <select class="form-select" id="fRepeat">
+        <option value="none">No repeat</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
 
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Term 2</div>
-            <div>
-              <div class="term-name">Penggal 2, 2026</div>
-              <div class="term-dates">24 Mar – 30 May 2026</div>
-            </div>
-          </div>
-          <div>
-            <span class="holiday-pill">🎂 Miki Birthday: 2 May</span>
-            <span class="holiday-pill">⭐ Wesak: 12 May</span>
-          </div>
-        </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="fNotes" placeholder="Any extra details…"></textarea>
+    </div>
 
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Break 2</div>
-            <div>
-              <div class="term-name">Mid-term Break 2</div>
-              <div class="term-dates">31 May – 14 Jun 2026</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Term 3</div>
-            <div>
-              <div class="term-name">Penggal 3, 2026</div>
-              <div class="term-dates">15 Jun – 22 Aug 2026</div>
-            </div>
-          </div>
-          <div>
-            <span class="holiday-pill">🇲🇾 Merdeka: 31 Aug</span>
-          </div>
-        </div>
-
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Break 3</div>
-            <div>
-              <div class="term-name">Mid-term Break 3</div>
-              <div class="term-dates">23 Aug – 6 Sep 2026</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Term 4</div>
-            <div>
-              <div class="term-name">Penggal 4, 2026</div>
-              <div class="term-dates">7 Sep – 14 Nov 2026</div>
-            </div>
-          </div>
-          <div>
-            <span class="holiday-pill">🌙 Deepavali: 20 Oct</span>
-            <span class="holiday-pill">🇲🇾 Malaysia Day: 16 Sep</span>
-          </div>
-        </div>
-
-        <div class="school-term">
-          <div class="term-header">
-            <div class="term-badge">Break 4</div>
-            <div>
-              <div class="term-name">Year-end Holidays</div>
-              <div class="term-dates">15 Nov – 31 Dec 2026</div>
-            </div>
-          </div>
-          <div>
-            <span class="holiday-pill">🎄 Christmas: 25 Dec</span>
-            <span class="holiday-pill">🍾 New Year: 31 Dec</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Lisa SJK(C) Sentul Prep -->
-      <div class="section-head" style="padding-top:16px;">
-        <div class="section-title">🏫 Lisa — SJK(C) Sentul 2027</div>
-      </div>
-
-      <div style="padding:0 16px 8px;">
-        <div class="kid-card">
-          <div class="kid-header">
-            <div class="kid-avatar">👧</div>
-            <div>
-              <div class="kid-name">Lisa</div>
-              <div class="kid-age">4 years old • Starts Jan 2027 • ~9 months</div>
-            </div>
-          </div>
-
-          <div class="progress-row">
-            <div class="progress-label">Overall Prep</div>
-            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:20%"></div></div>
-            <div class="progress-pct">20%</div>
-          </div>
-
-          <div style="margin-top:10px;">
-            <div class="vax-item">
-              <div class="vax-check">⬜</div>
-              <div class="vax-name">School registration / SJK(C) Sentul enrolment</div>
-              <div class="vax-date">By Oct 2026</div>
-            </div>
-            <div class="vax-item">
-              <div class="vax-check">⬜</div>
-              <div class="vax-name">APDM parent registration</div>
-              <div class="vax-date">With school</div>
-            </div>
-            <div class="vax-item">
-              <div class="vax-check">⬜</div>
-              <div class="vax-name">Booster vaccinations (before Year 1)</div>
-              <div class="vax-date">2026</div>
-            </div>
-            <div class="vax-item">
-              <div class="vax-check">⬜</div>
-              <div class="vax-name">School uniform, bag, stationery</div>
-              <div class="vax-date">Dec 2026</div>
-            </div>
-            <div class="vax-item">
-              <div class="vax-check">⬜</div>
-              <div class="vax-name">Chinese reading/writing prep</div>
-              <div class="vax-date">Ongoing</div>
-            </div>
-            <div class="vax-item">
-              <div class="vax-check">✅</div>
-              <div class="vax-name">Research SJK(C) Sentul school location</div>
-              <div class="vax-date">Done</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Public Holidays -->
-      <div class="section-head" style="padding-top:4px;">
-        <div class="section-title">🇲🇾 Public Holidays 2026</div>
-      </div>
-
-      <div style="padding:0 16px 8px;">
-        <div class="ph-chip"><div class="ph-chip-date">1 Jan</div><div class="ph-chip-name">New Year's Day</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">27 Jan</div><div class="ph-chip-name">Israk Mikraj</div><div class="ph-chip-state">KL/Sel</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">29–30 Jan</div><div class="ph-chip-name">Chinese New Year</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">1 Feb</div><div class="ph-chip-name">Federal Territory Day</div><div class="ph-chip-state">KL</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">11 Feb</div><div class="ph-chip-name">Thaipusam</div><div class="ph-chip-state">KL/Sel</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">~30 Mar</div><div class="ph-chip-name">Hari Raya Aidilfitri</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">~31 Mar</div><div class="ph-chip-name">Hari Raya (Day 2)</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">1 May</div><div class="ph-chip-name">Labour Day</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">~6 Jun</div><div class="ph-chip-name">Yang di-Pertuan Agong Birthday</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">12 May</div><div class="ph-chip-name">Wesak Day</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">7 Jun</div><div class="ph-chip-name">Hari Raya Haji</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">27 Jun</div><div class="ph-chip-name">Awal Muharram</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">31 Aug</div><div class="ph-chip-name">Hari Merdeka</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">16 Sep</div><div class="ph-chip-name">Malaysia Day</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">5 Sep</div><div class="ph-chip-name">Maulidur Rasul</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">20 Oct</div><div class="ph-chip-name">Deepavali</div><div class="ph-chip-state">National</div></div>
-        <div class="ph-chip"><div class="ph-chip-date">25 Dec</div><div class="ph-chip-name">Christmas Day</div><div class="ph-chip-state">National</div></div>
-      </div>
-
-    </section>
-
-    <!-- ═══════════════════════════ FAMILY ═══════════════════════════ -->
-    <section class="page" id="page-family">
-
-      <div class="section-head">
-        <div class="section-title">Family Hub</div>
-      </div>
-
-      <!-- Kids -->
-      <div style="padding:0 16px;">
-
-        <!-- Lisa -->
-        <div class="kid-card">
-          <div class="kid-header">
-            <div class="kid-avatar">👧</div>
-            <div>
-              <div class="kid-name">Lisa</div>
-              <div class="kid-age">4 years old • Birthday: 12 March • SJK(C) Sentul 2027</div>
-            </div>
-          </div>
-
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Vaccinations</div>
-
-          <div class="vax-item">
-            <div class="vax-check">✅</div>
-            <div class="vax-name">MMR Booster (18m)</div>
-            <div class="vax-date">Done</div>
-          </div>
-          <div class="vax-item">
-            <div class="vax-check">✅</div>
-            <div class="vax-name">DTaP Booster (18m)</div>
-            <div class="vax-date">Done</div>
-          </div>
-          <div class="vax-item">
-            <div class="vax-check">⬜</div>
-            <div class="vax-name">MMR 2nd dose (7y)</div>
-            <div class="vax-date">2028</div>
-          </div>
-          <div class="vax-item">
-            <div class="vax-check">⬜</div>
-            <div class="vax-name">School pre-entry booster</div>
-            <div class="vax-date">Before Jan 2027</div>
-          </div>
-
-          <div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">School Prep</div>
-          <div class="progress-row">
-            <div class="progress-label">SJK(C) Sentul Readiness</div>
-            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:20%"></div></div>
-            <div class="progress-pct">20%</div>
-          </div>
-          <div class="progress-row">
-            <div class="progress-label">Chinese Literacy</div>
-            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:10%;background:var(--crescent);"></div></div>
-            <div class="progress-pct">10%</div>
-          </div>
-
-        </div>
-
-        <!-- Miki -->
-        <div class="kid-card">
-          <div class="kid-header">
-            <div class="kid-avatar">👦</div>
-            <div>
-              <div class="kid-name">Miki</div>
-              <div class="kid-age">3 years old • Birthday: 2 May • Taska Di Rumah Ayu</div>
-            </div>
-          </div>
-
-          <!-- Taska quick toggle -->
-          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
-            <div style="width:36px;height:36px;border-radius:10px;background:#7cb8e822;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏡</div>
-            <div style="flex:1;">
-              <div style="font-weight:700;font-size:13px;">Taska Di Rumah Ayu</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="taskaStatus">Tap to mark Miki dropped off today</div>
-            </div>
-            <button class="toggle" id="taskaToggle" onclick="toggleTaska()" style="flex-shrink:0;"></button>
-          </div>
-
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Vaccinations</div>
-
-          <div class="vax-item">
-            <div class="vax-check">✅</div>
-            <div class="vax-name">MMR Booster (18m)</div>
-            <div class="vax-date">Done</div>
-          </div>
-          <div class="vax-item">
-            <div class="vax-check">✅</div>
-            <div class="vax-name">DTaP Booster (18m)</div>
-            <div class="vax-date">Done</div>
-          </div>
-          <div class="vax-item">
-            <div class="vax-check">⬜</div>
-            <div class="vax-name">Flu Vaccine (annual)</div>
-            <div class="vax-date">Annual</div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
-              <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
-              <div class="reminder-body">
-                <div class="reminder-title">Miki turns 4 on 2 May!</div>
-                <div class="reminder-sub">Plan something fun — 39 days away</div>
-              </div>
-              <div class="reminder-badge badge-week">39d</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Thomas -->
-        <div class="kid-card">
-          <div class="kid-header">
-            <div class="kid-avatar">💑</div>
-            <div>
-              <div class="kid-name">Thomas</div>
-              <div class="kid-age">Partner • Birthday: 12 February</div>
-            </div>
-          </div>
-
-          <div class="reminder-card" style="margin:0 0 8px;border-radius:var(--radius-sm);">
-            <div class="check-circle checked" style="margin-top:7px;">✓</div>
-            <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
-            <div class="reminder-body">
-              <div class="reminder-title">Thomas's Birthday — 12 Feb</div>
-              <div class="reminder-sub">Arrange dinner / buy cake • This year passed ✓</div>
-            </div>
-            <div class="reminder-badge badge-done">Done</div>
-          </div>
-
-          <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
-            <div class="check-circle" onclick="toggleCheck(this)"></div>
-            <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🍽️</div>
-            <div class="reminder-body">
-              <div class="reminder-title">Plan Date Night with Thomas</div>
-              <div class="reminder-sub">It's been a while — plan something nice 💖</div>
-            </div>
-            <div class="reminder-badge badge-week">Soon</div>
-          </div>
-
-        </div>
-
-        <!-- Syabil -->
-        <div class="kid-card">
-          <div class="kid-header">
-            <div class="kid-avatar">👦</div>
-            <div>
-              <div class="kid-name">Syabil</div>
-              <div class="kid-age">Stepson • Birthday: 8 March</div>
-            </div>
-          </div>
-          <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);">
-            <div class="check-circle checked" style="margin-top:7px;">✓</div>
-            <div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div>
-            <div class="reminder-body">
-              <div class="reminder-title">Syabil's Birthday — 8 March</div>
-              <div class="reminder-sub">Passed this year — did you celebrate? 🎉</div>
-            </div>
-            <div class="reminder-badge badge-done">Passed</div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Meal Planner -->
-      <div class="section-head" style="padding-top:6px;">
-        <div class="section-title">🍽️ This Week's Meals</div>
-        <span class="section-link">Edit</span>
-      </div>
-
-      <div style="padding:0 16px 8px;">
-        <div class="meal-day">
-          <div class="meal-day-head">
-            <div class="meal-day-name">Tuesday</div>
-            <div class="meal-day-date">24 Mar</div>
-          </div>
-          <div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-value">Nasi goreng kampung + telur mata</div></div>
-          <div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Sup tulang + nasi putih</div></div>
-        </div>
-        <div class="meal-day">
-          <div class="meal-day-head">
-            <div class="meal-day-name">Wednesday</div>
-            <div class="meal-day-date">25 Mar</div>
-          </div>
-          <div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-empty">Not planned yet</div></div>
-          <div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Ayam masak merah + pucuk paku</div></div>
-        </div>
-        <div class="meal-day">
-          <div class="meal-day-head">
-            <div class="meal-day-name">Thursday</div>
-            <div class="meal-day-date">26 Mar</div>
-          </div>
-          <div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-empty">Not planned yet</div></div>
-          <div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-empty">Not planned yet</div></div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ═══════════════════════════ SETTINGS ═══════════════════════════ -->
-    <section class="page" id="page-settings">
-
-      <div class="profile-card">
-        <div class="profile-avatar">👩‍💻</div>
-        <div>
-          <div class="profile-name">Mommy</div>
-          <div class="profile-title">KL, Malaysia 🇲🇾</div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">Appearance</div>
-        <div class="settings-group">
-          <div class="settings-row" onclick="toggleTheme()">
-            <div class="settings-icon">🌙</div>
-            <div class="settings-label">Dark Mode</div>
-            <button class="toggle on" id="themeToggleSettings" onclick="event.stopPropagation();toggleTheme()"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">🌸</div>
-            <div class="settings-label">Color Theme</div>
-            <div class="settings-value">Rose Gold</div>
-            <div class="settings-arrow">›</div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">🔤</div>
-            <div class="settings-label">Font</div>
-            <div class="settings-value">Playfair + Nunito</div>
-            <div class="settings-arrow">›</div>
-          </div>
-        </div>
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">AI & Sync</div>
-        <div class="settings-group">
-          <div class="settings-row">
-            <div class="settings-icon">🤖</div>
-            <div class="settings-label">Anthropic API Key</div>
-            <div class="settings-value">Not set</div>
-            <div class="settings-arrow">›</div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">☁️</div>
-            <div class="settings-label">Google Drive Sync</div>
-            <div class="settings-value">Phase 3</div>
-            <div class="settings-arrow">›</div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">🔐</div>
-            <div class="settings-label">Google Account</div>
-            <div class="settings-value">Not signed in</div>
-            <div class="settings-arrow">›</div>
-          </div>
-        </div>
-
-        <div style="padding:0 4px 8px;">
-          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;color:var(--text);">🔑 Paste Anthropic API Key</label>
-          <input class="settings-input" type="password" placeholder="sk-ant-api03-..." id="apiKeyInput">
-          <button onclick="saveApiKey()" style="margin-top:8px;width:100%;padding:10px;background:var(--rose-gold);border:none;border-radius:10px;color:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;">Save Key</button>
-        </div>
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">Data</div>
-        <div class="settings-group">
-          <div class="settings-row">
-            <div class="settings-icon">📦</div>
-            <div class="settings-label">Export Data</div>
-            <div class="settings-arrow">›</div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">📥</div>
-            <div class="settings-label">Import Data</div>
-            <div class="settings-arrow">›</div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">🗑️</div>
-            <div class="settings-label" style="color:#e87c7c;">Clear All Data</div>
-            <div class="settings-arrow">›</div>
-          </div>
-        </div>
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px;">Notifications</div>
-        <div class="settings-group">
-          <div class="settings-row">
-            <div class="settings-icon">🔔</div>
-            <div class="settings-label">Push Notifications</div>
-            <button class="toggle on" onclick="event.stopPropagation()"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">⏰</div>
-            <div class="settings-label">Daily Reminder Time</div>
-            <div class="settings-value">8:00 AM</div>
-            <div class="settings-arrow">›</div>
-          </div>
-          <div class="settings-row">
-            <div class="settings-icon">📅</div>
-            <div class="settings-label">Bill Reminder (days before)</div>
-            <div class="settings-value">3 days</div>
-            <div class="settings-arrow">›</div>
-          </div>
-        </div>
-
-        <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">
-          Mommy Reminder Hub v1.0 (Phase 1 — UI Preview)<br>
-          Built with 🌸 &amp; ☽ for a super Mommy in KL
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
-  <!-- FAB -->
-  <button class="fab" onclick="showAddModal()" title="Add reminder">+</button>
-
-  <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-today" onclick="showPage('today')">
-      <span class="nav-icon">🏠</span>
-      <span>Today</span>
-    </button>
-    <button class="nav-item" id="nav-reminders" onclick="showPage('reminders')">
-      <span class="nav-icon">🔔</span>
-      <span>Reminders</span>
-      <span class="nav-badge">5</span>
-    </button>
-    <button class="nav-item" id="nav-finance" onclick="showPage('finance')">
-      <span class="nav-icon">💳</span>
-      <span>Finance</span>
-    </button>
-    <button class="nav-item" id="nav-calendar" onclick="showPage('calendar')">
-      <span class="nav-icon">📅</span>
-      <span>Calendar</span>
-    </button>
-    <button class="nav-item" id="nav-family" onclick="showPage('family')">
-      <span class="nav-icon">👨‍👩‍👧</span>
-      <span>Family</span>
-    </button>
-    <button class="nav-item" id="nav-settings" onclick="showPage('settings')">
-      <span class="nav-icon">⚙️</span>
-      <span>Settings</span>
-    </button>
-  </nav>
-
+    <button class="btn-primary" onclick="saveReminder()">Save Reminder</button>
+    <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+  </div>
 </div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Page Navigation ──
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('nav-' + name)?.classList.add('active');
-  // scroll main back to top on page switch
-  document.querySelector('.main-content').scrollTop = 0;
+// ════════════════════════════════════════
+// DATA LAYER — Google Drive (Phase 3 hook)
+// For Phase 2: persists to localStorage as
+// bridge until Drive is wired in Phase 3
+// ════════════════════════════════════════
+
+const STORE_KEY = 'mrh_reminders_v2';
+const SETTINGS_KEY = 'mrh_settings_v2';
+const TASKA_KEY = 'mrh_taska_v2';
+const NUDGE_KEY = 'mrh_nudges_v2';
+
+// Settings
+let settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+function saveSetting(k,v){ settings[k]=v; localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+// Reminders store
+let reminders = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+function persistReminders(){ localStorage.setItem(STORE_KEY, JSON.stringify(reminders)); setSyncDot('synced'); }
+
+// ── Category config ──
+const CAT = {
+  work:     { icon:'💻', bg:'#7c9ee822', color:'#7c9ee8' },
+  finance:  { icon:'💰', bg:'#7ce8c422', color:'#7ce8c4' },
+  school:   { icon:'🏫', bg:'#7cb8e822', color:'#7cb8e8' },
+  birthday: { icon:'🎂', bg:'#e87cb822', color:'#e87cb8' },
+  health:   { icon:'💊', bg:'#e87c7c22', color:'#e87c7c' },
+  holiday:  { icon:'🕌', bg:'#a8e87c22', color:'#7cb85a' },
+  pubhol:   { icon:'🇲🇾', bg:'#e8d47c22', color:'#c4a820' },
+  grocery:  { icon:'🛒', bg:'#e8a87c22', color:'#c47c3a' },
+  home:     { icon:'🏠', bg:'#e8b87c22', color:'#c4903a' },
+  selfcare: { icon:'🌸', bg:'#c47ce822', color:'#c47ce8' },
+  meals:    { icon:'🍽️', bg:'#f0a06022', color:'#d07840' },
+  other:    { icon:'📌', bg:'#a0a0a022', color:'#888' },
+};
+
+// ── Priority order ──
+const PRI_ORDER = { urgent:0, normal:1, low:2 };
+
+// ── Date helpers ──
+function today(){ return new Date(); }
+function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+function daysFrom(dueStr){
+  if(!dueStr) return 9999;
+  const due = startOfDay(new Date(dueStr));
+  const now = startOfDay(today());
+  return Math.round((due - now)/(1000*60*60*24));
+}
+function fmtDate(dueStr){
+  if(!dueStr) return '';
+  const d = new Date(dueStr);
+  const opts = { day:'numeric', month:'short', year:'numeric' };
+  return d.toLocaleDateString('en-MY', opts);
+}
+function fmtDays(n){
+  if(n < 0) return 'Overdue';
+  if(n === 0) return 'Today';
+  if(n === 1) return 'Tomorrow';
+  if(n <= 7) return `${n}d`;
+  return fmtDate(new Date(Date.now() + n*86400000).toISOString());
 }
 
-// ── Theme Toggle ──
-let isDark = true;
-function toggleTheme() {
-  isDark = !isDark;
-  document.body.dataset.theme = isDark ? 'dark' : 'light';
-  document.getElementById('themeToggle').textContent = isDark ? '🌙' : '☀️';
-  const settingsToggle = document.getElementById('themeToggleSettings');
-  if (settingsToggle) settingsToggle.classList.toggle('on', isDark);
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
+  setTodayHeader();
+  updateFinanceStatuses();
+  renderTodayPage();
+  renderReminderList();
+  renderCal();
+  loadNudges(false);
+  restoreTaska();
+  updateSettingsDisplay();
+  updateBadge();
+  handleURLParams();
+});
+
+// ── URL params (PWA shortcuts) ──
+function handleURLParams(){
+  const p = new URLSearchParams(window.location.search);
+  if(p.get('tab')) showPage(p.get('tab'));
+  if(p.get('action')==='add') openAddModal();
 }
 
-// ── FAB hide-on-scroll ──
-let lastScroll = 0;
-document.querySelector('.main-content').addEventListener('scroll', function() {
-  const fab = document.querySelector('.fab');
-  const current = this.scrollTop;
-  if (current > lastScroll + 10) {
-    fab.classList.add('hidden');
-  } else if (current < lastScroll - 10) {
-    fab.classList.remove('hidden');
+// ── Offline detection ──
+function updateOnline(){
+  const banner = document.getElementById('offlineBanner');
+  if(!navigator.onLine){
+    banner.classList.add('show');
+    setSyncDot('error');
+  } else {
+    banner.classList.remove('show');
+    setSyncDot('synced');
   }
-  lastScroll = current;
-}, { passive: true });
+}
+window.addEventListener('online', updateOnline);
+window.addEventListener('offline', updateOnline);
+updateOnline();
 
-// ── Finance Group Toggle ──
-function toggleGroup(header) {
+// ── Service Worker registration ──
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/mommy-hub/sw.js')
+    .then(reg => console.log('[SW] Registered', reg.scope))
+    .catch(err => console.warn('[SW] Registration failed', err));
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  const nv = document.getElementById('nav-'+name);
+  if(pg) pg.classList.add('active');
+  if(nv) nv.classList.add('active');
+  document.getElementById('mainContent').scrollTop = 0;
+  if(name==='today') renderTodayPage();
+  if(name==='reminders') renderReminderList();
+}
+
+// ── FAB scroll hide ──
+let lastScroll=0;
+document.getElementById('mainContent').addEventListener('scroll', function(){
+  const fab = document.getElementById('fab');
+  const cur = this.scrollTop;
+  if(cur > lastScroll+10) fab.classList.add('hidden');
+  else if(cur < lastScroll-10) fab.classList.remove('hidden');
+  lastScroll=cur;
+},{passive:true});
+
+// ════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════
+function applyTheme(){
+  const t = settings.theme || 'dark';
+  document.body.dataset.theme = t;
+  const isDark = t==='dark';
+  document.getElementById('themeToggle').textContent = isDark?'🌙':'☀️';
+  const ts = document.getElementById('themeToggleSettings');
+  if(ts) ts.classList.toggle('on', isDark);
+}
+function toggleTheme(){
+  settings.theme = (settings.theme||'dark')==='dark'?'light':'dark';
+  saveSetting('theme', settings.theme);
+  applyTheme();
+}
+
+// ════════════════════════════════════════
+// TODAY PAGE
+// ════════════════════════════════════════
+function setTodayHeader(){
+  const now = today();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('todayDayName').textContent = days[now.getDay()] + ' — Kuala Lumpur';
+  document.getElementById('todayFullDate').textContent = now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  document.getElementById('todayDayNum').textContent = now.getDate();
+}
+
+function renderTodayPage(){
+  const active = reminders.filter(r=>!r.done);
+  const urgent = active.filter(r=>r.priority==='urgent' || daysFrom(r.due)<=0);
+  const week = active.filter(r=>{ const d=daysFrom(r.due); return d>0 && d<=7; });
+  const bdays = active.filter(r=>r.category==='birthday');
+  document.getElementById('sumUrgent').textContent = urgent.length;
+  document.getElementById('sumWeek').textContent = week.length;
+  document.getElementById('sumBirthdays').textContent = bdays.length;
+
+  // Today list
+  const todayItems = active.filter(r=>{ const d=daysFrom(r.due); return d<=0; })
+    .sort((a,b)=> PRI_ORDER[a.priority||'normal']-PRI_ORDER[b.priority||'normal']);
+  const todayEl = document.getElementById('todayList');
+  todayEl.innerHTML = todayItems.length ? todayItems.map(r=>buildReminderCard(r,true)).join('')
+    : '<div style="padding:12px 0 4px;font-size:13px;color:var(--muted);">No reminders due today 🌸</div>';
+
+  // Upcoming (1–14 days)
+  const upcoming = active.filter(r=>{ const d=daysFrom(r.due); return d>0 && d<=14; })
+    .sort((a,b)=>daysFrom(a.due)-daysFrom(b.due)).slice(0,5);
+  const upEl = document.getElementById('upcomingList');
+  upEl.innerHTML = upcoming.length ? upcoming.map(r=>buildReminderCard(r,false)).join('')
+    : '<div style="padding:12px 0 4px;font-size:13px;color:var(--muted);">Nothing coming up in the next 2 weeks 🌸</div>';
+}
+
+// ════════════════════════════════════════
+// REMINDER RENDERING
+// ════════════════════════════════════════
+let currentFilter = 'all';
+let currentSort = 'due';
+
+function setFilter(btn, cat){
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = cat;
+  renderReminderList();
+}
+
+function setSort(s){
+  currentSort = s;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sort'+s.charAt(0).toUpperCase()+s.slice(1)).classList.add('active');
+  renderReminderList();
+}
+
+function renderReminderList(){
+  let list = reminders.filter(r=>!r.done);
+  if(currentFilter !== 'all') list = list.filter(r=>r.category===currentFilter);
+
+  // Sort
+  if(currentSort==='due'){
+    list.sort((a,b)=> daysFrom(a.due)-daysFrom(b.due));
+  } else if(currentSort==='priority'){
+    list.sort((a,b)=> (PRI_ORDER[a.priority||'normal'])-(PRI_ORDER[b.priority||'normal']));
+  } else {
+    list.sort((a,b)=> (a.category||'').localeCompare(b.category||''));
+  }
+
+  const el = document.getElementById('reminderList');
+  const empty = document.getElementById('reminderEmpty');
+  if(list.length===0){ el.innerHTML=''; empty.style.display='block'; }
+  else { empty.style.display='none'; el.innerHTML = list.map(r=>buildReminderCard(r,true)).join(''); }
+
+  // Archive
+  const done = reminders.filter(r=>r.done);
+  document.getElementById('archiveCount').textContent = done.length;
+  document.getElementById('archiveList').innerHTML = done.map(r=>`
+    <div class="archive-item">
+      <span style="font-size:18px;">${(CAT[r.category]||CAT.other).icon}</span>
+      <span class="arc-title">${esc(r.title)}</span>
+      <span class="arc-date">${fmtDate(r.due)||'No date'}</span>
+      <button class="arc-restore" onclick="restoreReminder('${r.id}')">↩ Restore</button>
+    </div>`).join('');
+
+  updateBadge();
+}
+
+function buildReminderCard(r, showCheck){
+  const c = CAT[r.category] || CAT.other;
+  const d = daysFrom(r.due);
+  let urgencyClass='', badge='';
+  if(d < 0){ urgencyClass='urgent'; badge=`<div class="reminder-badge badge-overdue">Overdue</div>`; }
+  else if(d===0){ urgencyClass='urgent'; badge=`<div class="reminder-badge badge-today">Today</div>`; }
+  else if(d<=2){ urgencyClass='soon'; badge=`<div class="reminder-badge badge-soon">${fmtDays(d)}</div>`; }
+  else if(d<=7){ badge=`<div class="reminder-badge badge-week">${fmtDays(d)}</div>`; }
+  else if(r.due){ badge=`<div class="reminder-badge badge-week">${fmtDate(r.due)}</div>`; }
+
+  const checkHtml = showCheck
+    ? `<div class="check-circle" onclick="event.stopPropagation();archiveReminder('${r.id}')"></div>`
+    : '';
+  const sub = [r.due?fmtDate(r.due):'', r.notes?r.notes.substring(0,40):''].filter(Boolean).join(' • ');
+
+  return `<div class="reminder-card ${urgencyClass}" onclick="editReminder('${r.id}')">
+    ${checkHtml}
+    <div class="cat-dot" style="background:${c.bg};color:${c.color}">${c.icon}</div>
+    <div class="reminder-body">
+      <div class="reminder-title">${esc(r.title)}</div>
+      ${sub?`<div class="reminder-sub">${esc(sub)}</div>`:''}
+    </div>
+    ${badge}
+  </div>`;
+}
+
+function updateBadge(){
+  const count = reminders.filter(r=>!r.done && daysFrom(r.due)<=3).length;
+  const badge = document.getElementById('reminderBadge');
+  if(count>0){ badge.style.display=''; badge.textContent=count; }
+  else badge.style.display='none';
+}
+
+// ════════════════════════════════════════
+// ADD / EDIT MODAL
+// ════════════════════════════════════════
+let editingId = null;
+
+function openAddModal(){
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'New Reminder';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fDue').value='';
+  document.getElementById('fRepeat').value='none';
+  document.getElementById('fNotes').value='';
+  document.querySelectorAll('.cat-grid-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.priority-btn').forEach(b=>{
+    b.classList.remove('sel-urgent','sel-normal','sel-low');
+  });
+  document.querySelector('[data-pri="normal"]').classList.add('sel-normal');
+  document.getElementById('addModal').classList.add('open');
+}
+
+function editReminder(id){
+  const r = reminders.find(x=>x.id===id);
+  if(!r) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Reminder';
+  document.getElementById('fTitle').value = r.title||'';
+  document.getElementById('fDue').value = r.due ? r.due.substring(0,16) : '';
+  document.getElementById('fRepeat').value = r.repeat||'none';
+  document.getElementById('fNotes').value = r.notes||'';
+  document.querySelectorAll('.cat-grid-btn').forEach(b=>{
+    b.classList.toggle('selected', b.dataset.cat===r.category);
+  });
+  document.querySelectorAll('.priority-btn').forEach(b=>{
+    b.classList.remove('sel-urgent','sel-normal','sel-low');
+    if(b.dataset.pri===r.priority) b.classList.add('sel-'+r.priority);
+  });
+  document.getElementById('addModal').classList.add('open');
+}
+
+function selectCat(btn){
+  document.querySelectorAll('.cat-grid-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function selectPri(btn){
+  document.querySelectorAll('.priority-btn').forEach(b=>b.classList.remove('sel-urgent','sel-normal','sel-low'));
+  btn.classList.add('sel-'+btn.dataset.pri);
+}
+
+function saveReminder(){
+  const title = document.getElementById('fTitle').value.trim();
+  if(!title){ showToast('Please enter a title'); return; }
+  const catBtn = document.querySelector('.cat-grid-btn.selected');
+  if(!catBtn){ showToast('Please select a category'); return; }
+  const priBtn = document.querySelector('.priority-btn[class*="sel-"]');
+
+  const r = {
+    id: editingId || 'r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6),
+    title,
+    category: catBtn.dataset.cat,
+    priority: priBtn ? priBtn.dataset.pri : 'normal',
+    due: document.getElementById('fDue').value || null,
+    repeat: document.getElementById('fRepeat').value,
+    notes: document.getElementById('fNotes').value.trim(),
+    done: false,
+    createdAt: editingId ? (reminders.find(x=>x.id===editingId)||{}).createdAt : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  if(editingId){
+    const idx = reminders.findIndex(x=>x.id===editingId);
+    if(idx>-1) reminders[idx]=r;
+    showToast('Reminder updated ✓');
+  } else {
+    reminders.push(r);
+    showToast('Reminder added 🌸');
+  }
+  persistReminders();
+  closeModal();
+  renderTodayPage();
+  renderReminderList();
+}
+
+function archiveReminder(id){
+  const r = reminders.find(x=>x.id===id);
+  if(!r) return;
+  r.done = true;
+  r.completedAt = new Date().toISOString();
+
+  // Handle repeat — create next occurrence
+  if(r.repeat && r.repeat!=='none' && r.due){
+    const next = new Date(r.due);
+    if(r.repeat==='daily') next.setDate(next.getDate()+1);
+    else if(r.repeat==='weekly') next.setDate(next.getDate()+7);
+    else if(r.repeat==='monthly') next.setMonth(next.getMonth()+1);
+    else if(r.repeat==='yearly') next.setFullYear(next.getFullYear()+1);
+    reminders.push({ ...r, id:'r_'+Date.now(), done:false, completedAt:undefined,
+      due:next.toISOString(), createdAt:new Date().toISOString() });
+    showToast('Done ✓ — next occurrence created');
+  } else {
+    showToast('Moved to completed archive');
+  }
+  persistReminders();
+  renderTodayPage();
+  renderReminderList();
+}
+
+function restoreReminder(id){
+  const r = reminders.find(x=>x.id===id);
+  if(!r) return;
+  r.done = false;
+  delete r.completedAt;
+  persistReminders();
+  renderReminderList();
+  showToast('Restored ↩');
+}
+
+function toggleDoneCard(card){
+  const circle = card.querySelector('.check-circle');
+  if(circle){ circle.classList.add('checked'); circle.textContent='✓'; }
+  card.classList.add('done');
+}
+
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  el.textContent = el.classList.contains('checked')?'✓':'';
+  const card = el.closest('.reminder-card');
+  if(card) card.classList.toggle('done', el.classList.contains('checked'));
+}
+
+function toggleArchive(){
+  const list = document.getElementById('archiveList');
+  const chev = document.getElementById('archiveChevron');
+  const open = list.style.display!=='none';
+  list.style.display = open?'none':'block';
+  chev.textContent = open?'▸':'▾';
+}
+
+function closeModal(){
+  document.getElementById('addModal').classList.remove('open');
+}
+function closeModalOnOverlay(e){
+  if(e.target===document.getElementById('addModal')) closeModal();
+}
+
+// ════════════════════════════════════════
+// TASKA
+// ════════════════════════════════════════
+let taskaOn = false;
+function restoreTaska(){
+  const saved = localStorage.getItem(TASKA_KEY);
+  if(saved){
+    const obj = JSON.parse(saved);
+    const todayStr = today().toDateString();
+    if(obj.date===todayStr) taskaOn=obj.on;
+  }
+  syncTaskaUI();
+}
+function syncTaskaUI(){
+  ['taskaToggleToday','taskaToggle'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('on',taskaOn);
+  });
+  const msg = taskaOn?'✓ Dropped off at Taska today':'Not dropped off yet today';
+  const msg2 = taskaOn?'✓ Miki dropped off today':'Tap to mark Miki dropped off today';
+  const s1=document.getElementById('taskaStatusToday');
+  const s2=document.getElementById('taskaStatus');
+  if(s1) s1.textContent=msg;
+  if(s2) s2.textContent=msg2;
+  localStorage.setItem(TASKA_KEY, JSON.stringify({on:taskaOn, date:today().toDateString()}));
+}
+function toggleTaskaToday(){ taskaOn=!taskaOn; syncTaskaUI(); showToast(taskaOn?'Miki — dropped off ✓':'Miki — not dropped off'); }
+function toggleTaska(){ taskaOn=!taskaOn; syncTaskaUI(); showToast(taskaOn?'Miki — dropped off ✓':'Miki — not dropped off'); }
+
+// ════════════════════════════════════════
+// AI NUDGES — Anthropic API
+// ════════════════════════════════════════
+async function loadNudges(forceRefresh){
+  const apiKey = settings.apiKey;
+  const isOnline = navigator.onLine;
+
+  // Use cached nudges if available and not forcing refresh
+  if(!forceRefresh){
+    const cached = localStorage.getItem(NUDGE_KEY);
+    if(cached){
+      const obj = JSON.parse(cached);
+      renderNudges(obj.nudges, false);
+      return;
+    }
+  }
+
+  if(!isOnline){
+    renderNudges([{
+      emoji:'📵',
+      text:"You're offline right now. AI nudges will load when you're back online.",
+      tag:'Offline',
+      style:'background:linear-gradient(135deg,#4a4a4a,#666)'
+    }], false);
+    return;
+  }
+
+  if(!apiKey){
+    renderNudges(getStaticNudges(), false);
+    return;
+  }
+
+  // Show loading state
+  document.getElementById('nudgeScroll').innerHTML = `
+    <div class="nudge-card loading">
+      <div class="nudge-loading"><div class="nudge-spinner"></div>Getting AI nudges…</div>
+    </div>`;
+
+  // Build context for Claude
+  const now = today();
+  const upcoming = reminders.filter(r=>!r.done)
+    .filter(r=>{ const d=daysFrom(r.due); return d>=0 && d<=30; })
+    .sort((a,b)=>daysFrom(a.due)-daysFrom(b.due))
+    .slice(0,10);
+
+  // Public holiday context
+  const holidays = [
+    {name:'Hari Raya Aidilfitri', date:'2026-03-30'},
+    {name:'Labour Day', date:'2026-05-01'},
+    {name:'Wesak Day', date:'2026-05-12'},
+    {name:'Hari Raya Haji', date:'2026-06-07'},
+  ];
+  const upcomingHols = holidays.map(h=>{
+    const d = daysFrom(h.date);
+    return d>=0 && d<=30 ? `${h.name} in ${d} days` : null;
+  }).filter(Boolean);
+
+  const prompt = `You are a warm, caring personal assistant for a working mom in Kuala Lumpur, Malaysia. Her name is Mommy (or Ummi). 
+Her family: partner Thomas (birthday 12 Feb), daughter Lisa (4yo, going to SJK(C) Sentul Jan 2027), son Miki (3yo, at Taska Di Rumah Ayu), stepson Syabil (birthday 8 March).
+She is an L3 Cloud Administrator (VMware + Hyper-V). Monthly KPI: SNOW Knowledge Base contribution. Monthly Oracle Linux 8 patching (date varies).
+Today: ${now.toDateString()}. 
+Upcoming reminders: ${upcoming.map(r=>`${r.title} (${daysFrom(r.due)===0?'today':daysFrom(r.due)+' days'}, ${r.category})`).join('; ') || 'none'}.
+Upcoming Malaysian public holidays: ${upcomingHols.join(', ') || 'none in next 30 days'}.
+Generate exactly 5 proactive, warm, specific nudge cards. Each nudge must be a JSON object with: emoji (1 emoji), text (1-2 sentences, warm, specific, include Malay phrases naturally), tag (short category label), style (CSS background gradient string).
+Use different gradient colours for each card. Mix rose gold, teal, purple, blue, green tones.
+Respond ONLY with a valid JSON array of 5 objects. No markdown, no explanation.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{ role:'user', content:prompt }]
+      })
+    });
+    const data = await res.json();
+    if(data.error){ throw new Error(data.error.message); }
+    let raw = data.content[0].text.trim();
+    raw = raw.replace(/```json|```/g,'').trim();
+    const nudges = JSON.parse(raw);
+    localStorage.setItem(NUDGE_KEY, JSON.stringify({ nudges, cachedAt: Date.now() }));
+    renderNudges(nudges, false);
+  } catch(err){
+    console.warn('Nudge API error:', err);
+    renderNudges(getStaticNudges(), false);
+  }
+}
+
+function getStaticNudges(){
+  const now = today();
+  const dd = now.getDate(); const mm = now.getMonth()+1;
+  return [
+    { emoji:'🕌', text:'Hari Raya Aidilfitri is coming soon! Have you bought baju raya, prepared lemang and kuih, and sorted duit raya for the kids?', tag:'Holiday 🌙', style:'background:linear-gradient(135deg,#4a7a6a,#6ab8a0)' },
+    { emoji:'🎂', text:"Lisa's birthday is coming up — turning 5! Start planning her party. What does she love most right now?", tag:'Birthday 🎉', style:'background:linear-gradient(135deg,var(--rose-gold-dark),var(--rose-gold))' },
+    { emoji:'📝', text:'SNOW Knowledge Base contribution is your monthly KPI — have you drafted your KB article this month? End of month is approaching!', tag:'Work 💻', style:'background:linear-gradient(135deg,#5a8a5a,#7cb87c)' },
+    { emoji:'💰', text:'Mortgage Mawar is due before the 4th — make sure funds are ready in your account soon, jangan lupa!', tag:'Finance 💳', style:'background:linear-gradient(135deg,#8a5a5a,#c47c7c)' },
+    { emoji:'🌸', text:"When did you last have proper me-time? Plan something small this weekend — gym, a quiet coffee, or even just 30 minutes alone. You deserve it, Mommy!", tag:'Self-Care 🌸', style:'background:linear-gradient(135deg,#7a5a8a,#c47ce8)' },
+  ];
+}
+
+function renderNudges(nudges, loading){
+  const scroll = document.getElementById('nudgeScroll');
+  if(loading){
+    scroll.innerHTML = `<div class="nudge-card loading"><div class="nudge-loading"><div class="nudge-spinner"></div>Loading…</div></div>`;
+    return;
+  }
+  scroll.innerHTML = nudges.map(n=>`
+    <div class="nudge-card" style="${n.style||''}">
+      <div class="nudge-emoji">${n.emoji}</div>
+      <div class="nudge-text">${esc(n.text)}</div>
+      <div class="nudge-tag">${n.tag}</div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════
+// FINANCE STATUS (auto-update by date)
+// ════════════════════════════════════════
+function updateFinanceStatuses(){
+  const dd = today().getDate();
+  const setEl = (id, cls, txt) => { const el=document.getElementById(id); if(el){el.className='finance-status '+cls;el.textContent=txt;} };
+  // Mortgage Mawar
+  if(dd>=1 && dd<=3) setEl('mawarStatus','status-soon',`Pay in ${4-dd}d`);
+  else if(dd===4) setEl('mawarStatus','status-due','Due today!');
+  else setEl('mawarStatus','status-ok','✓');
+  // TNB bills out on 23rd
+  if(dd===23) { setEl('tnbKjStatus','status-due','Bill out!'); setEl('tnbMawarStatus','status-due','Bill out!'); }
+  else if(dd>23) { setEl('tnbKjStatus','status-pending','Pay now'); setEl('tnbMawarStatus','status-pending','Pay now'); }
+  else { setEl('tnbKjStatus','status-ok','Upcoming'); setEl('tnbMawarStatus','status-ok','Upcoming'); }
+  // Unifi ~22nd
+  if(dd>=22) setEl('unifiStatus','status-due','Bill out');
+  else setEl('unifiStatus','status-ok','Upcoming');
+  // Celcom 24th
+  if(dd===24) setEl('celcomStatus','status-due','Bill out!');
+  else if(dd>24) setEl('celcomStatus','status-pending','Pay now');
+  else setEl('celcomStatus','status-ok','Upcoming');
+  // TnG 25th
+  if(dd===25) setEl('tngStatus','status-due','Top-up today!');
+  else if(dd>=23 && dd<25) setEl('tngStatus','status-soon',`${25-dd}d`);
+  else setEl('tngStatus','status-ok','✓');
+}
+
+// ════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════
+function saveApiKey(){
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if(!val){ showToast('Please enter an API key'); return; }
+  saveSetting('apiKey', val);
+  document.getElementById('apiKeyInput').value='';
+  updateSettingsDisplay();
+  showToast('API key saved ✓');
+}
+function saveTelegram(){
+  const bot = document.getElementById('tgBotInput').value.trim();
+  const chat = document.getElementById('tgChatInput').value.trim();
+  if(!bot||!chat){ showToast('Please fill both Telegram fields'); return; }
+  saveSetting('tgBot', bot);
+  saveSetting('tgChat', chat);
+  document.getElementById('tgBotInput').value='';
+  document.getElementById('tgChatInput').value='';
+  updateSettingsDisplay();
+  showToast('Telegram settings saved ✓');
+}
+function updateSettingsDisplay(){
+  const apiEl = document.getElementById('apiKeyStatus');
+  if(apiEl) apiEl.textContent = settings.apiKey ? '✓ Set':'Not set';
+  const tgBot = document.getElementById('tgBotStatus');
+  const tgChat = document.getElementById('tgChatStatus');
+  if(tgBot) tgBot.textContent = settings.tgBot ? '✓ Set':'Not set';
+  if(tgChat) tgChat.textContent = settings.tgChat ? '✓ Set':'Not set';
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify({reminders, settings:{...settings,apiKey:undefined,tgBot:undefined}}, null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mommy-reminder-hub-backup.json';
+  a.click();
+  showToast('Data exported ✓');
+}
+function importData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(data.reminders) reminders = data.reminders;
+      persistReminders();
+      renderReminderList();
+      renderTodayPage();
+      showToast('Data imported ✓');
+    } catch { showToast('Invalid file'); }
+  };
+  reader.readAsText(file);
+}
+function clearAllData(){
+  if(!confirm('Clear all reminders? This cannot be undone.')) return;
+  reminders=[];
+  persistReminders();
+  renderReminderList();
+  renderTodayPage();
+  showToast('All reminders cleared');
+}
+
+// ════════════════════════════════════════
+// SYNC DOT
+// ════════════════════════════════════════
+function setSyncDot(state){
+  const dot = document.getElementById('syncDot');
+  if(!dot) return;
+  dot.className = 'sync-dot ' + state;
+  dot.title = state==='synced'?'Data saved':state==='syncing'?'Syncing…':'Offline / error';
+}
+
+// ════════════════════════════════════════
+// FINANCE GROUPS
+// ════════════════════════════════════════
+function toggleGroup(header){
   header.closest('.finance-group').classList.toggle('open');
 }
 
-// ── Check/Done ──
-function toggleCheck(el) {
-  el.classList.toggle('checked');
-  el.textContent = el.classList.contains('checked') ? '✓' : '';
-  const card = el.closest('.reminder-card');
-  if (card) card.classList.toggle('done', el.classList.contains('checked'));
-}
-
-function toggleDone(card) {
-  const circle = card.querySelector('.check-circle');
-  if (circle) toggleCheck(circle);
-}
-
-// ── Category filter ──
-function filterCat(btn, cat) {
-  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
-  if (cat !== 'all') showToast('Filtering: ' + cat);
-}
-
-// ── Taska Toggles ──
-let taskaOn = false;
-function toggleTaskaToday() {
-  taskaOn = !taskaOn;
-  const tog = document.getElementById('taskaToggleToday');
-  const status = document.getElementById('taskaStatusToday');
-  if (tog) tog.classList.toggle('on', taskaOn);
-  if (status) status.textContent = taskaOn ? '✓ Dropped off at Taska today' : 'Not dropped off yet today';
-  // sync family page toggle
-  const tog2 = document.getElementById('taskaToggle');
-  const status2 = document.getElementById('taskaStatus');
-  if (tog2) tog2.classList.toggle('on', taskaOn);
-  if (status2) status2.textContent = taskaOn ? '✓ Miki dropped off today' : 'Tap to mark Miki dropped off today';
-  showToast(taskaOn ? 'Miki — dropped off ✓' : 'Miki — marked not dropped off');
-}
-
-function toggleTaska() {
-  taskaOn = !taskaOn;
-  const tog = document.getElementById('taskaToggle');
-  const status = document.getElementById('taskaStatus');
-  if (tog) tog.classList.toggle('on', taskaOn);
-  if (status) status.textContent = taskaOn ? '✓ Miki dropped off today' : 'Tap to mark Miki dropped off today';
-  // sync today page toggle
-  const tog2 = document.getElementById('taskaToggleToday');
-  const status2 = document.getElementById('taskaStatusToday');
-  if (tog2) tog2.classList.toggle('on', taskaOn);
-  if (status2) status2.textContent = taskaOn ? '✓ Dropped off at Taska today' : 'Not dropped off yet today';
-  showToast(taskaOn ? 'Miki — dropped off ✓' : 'Miki — marked not dropped off');
-}
-
-// ── Toast ──
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ── Save API Key ──
-function saveApiKey() {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  if (!val) { showToast('Please enter an API key'); return; }
-  showToast('API key saved ✓');
-  document.getElementById('apiKeyInput').value = '';
-}
-
-// ── Add Modal (placeholder) ──
-function showAddModal() {
-  showToast('+ Add reminder (Phase 2)');
-}
-
-// ── Calendar ──
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const PH = {
+// ════════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════════
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const PH={
   '2026-1-1':true,'2026-1-27':true,'2026-1-29':true,'2026-1-30':true,
   '2026-2-1':true,'2026-2-11':true,'2026-2-12':true,
-  '2026-3-8':true,'2026-3-12':true,
-  '2026-3-30':true,'2026-3-31':true,
+  '2026-3-8':true,'2026-3-12':true,'2026-3-30':true,'2026-3-31':true,
   '2026-5-1':true,'2026-5-2':true,'2026-5-12':true,
-  '2026-6-7':true,'2026-6-27':true,
-  '2026-8-31':true,
-  '2026-9-5':true,'2026-9-16':true,
-  '2026-10-20':true,
-  '2026-12-25':true
+  '2026-6-7':true,'2026-6-27':true,'2026-8-31':true,
+  '2026-9-5':true,'2026-9-16':true,'2026-10-20':true,'2026-12-25':true
 };
-
-let calYear = 2026, calMonth = 2; // 0-indexed, March
-
-function renderCal() {
-  document.getElementById('calTitle').textContent = MONTHS[calMonth] + ' ' + calYear;
-  const grid = document.getElementById('calGrid');
-  grid.innerHTML = '';
-
-  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
-    const el = document.createElement('div');
-    el.className = 'cal-day-name';
-    el.textContent = d;
-    grid.appendChild(el);
+let calYear=2026,calMonth=2;
+function renderCal(){
+  document.getElementById('calTitle').textContent=MONTHS[calMonth]+' '+calYear;
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>{
+    const el=document.createElement('div');
+    el.className='cal-day-name'; el.textContent=d; grid.appendChild(el);
   });
-
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const prevDays = new Date(calYear, calMonth, 0).getDate();
-  const today = new Date();
-
-  for (let i = firstDay - 1; i >= 0; i--) {
-    const el = document.createElement('div');
-    el.className = 'cal-day other-month';
-    el.textContent = prevDays - i;
-    grid.appendChild(el);
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const prevDays=new Date(calYear,calMonth,0).getDate();
+  const t=today();
+  for(let i=firstDay-1;i>=0;i--){
+    const el=document.createElement('div'); el.className='cal-day other-month';
+    el.textContent=prevDays-i; grid.appendChild(el);
   }
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const el = document.createElement('div');
-    el.className = 'cal-day';
-    el.textContent = d;
-    const key = `${calYear}-${calMonth+1}-${d}`;
-    if (PH[key]) el.classList.add('has-event');
-    if (calYear === today.getFullYear() && calMonth === today.getMonth() && d === today.getDate()) {
-      el.classList.add('today');
-    }
-    if (PH[key] && (key.includes('-3-30') || key.includes('-3-31') || key.includes('-8-31') || key.includes('-5-1') || key.includes('-9-16'))) {
-      el.classList.add('ph');
-    }
+  for(let d=1;d<=daysInMonth;d++){
+    const el=document.createElement('div'); el.className='cal-day'; el.textContent=d;
+    const key=`${calYear}-${calMonth+1}-${d}`;
+    if(PH[key]) el.classList.add('has-event');
+    if(calYear===t.getFullYear()&&calMonth===t.getMonth()&&d===t.getDate()) el.classList.add('today');
+    if(PH[key]&&(key.includes('-3-30')||key.includes('-3-31')||key.includes('-8-31')||key.includes('-5-1')||key.includes('-9-16'))) el.classList.add('ph');
+    // Check if any reminder falls on this day
+    const dayStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    if(reminders.some(r=>r.due&&r.due.startsWith(dayStr))) el.classList.add('has-event');
     grid.appendChild(el);
   }
 }
+function calPrev(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); }
+function calNext(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); }
 
-function calPrev() {
-  calMonth--;
-  if (calMonth < 0) { calMonth = 11; calYear--; }
-  renderCal();
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
 }
-
-function calNext() {
-  calMonth++;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  renderCal();
-}
-
-// Init
-renderCal();
 </script>
-
 </body>
 </html>
