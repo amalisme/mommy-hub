@@ -150,7 +150,8 @@ jobs:
           }
 
           if (messages.length === 0) {
-            messages.push(`🌸 *Test message!*\nYour Mommy Reminder Hub notifications are working perfectly!`);
+            console.log('No reminders for today — nothing to send');
+            process.exit(0);
           }
 
           // Build Telegram message
