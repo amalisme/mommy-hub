@@ -43,8 +43,11 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 
 /* ── App Shell ── */
 #app{max-width:430px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+/* Safe area top — critical for PWA on iPhone notch/Dynamic Island */
 .app-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);
-  padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 20px 10px;
+  padding-top:calc(12px + env(safe-area-inset-top, 0px));
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .header-brand{display:flex;align-items:center;gap:8px}
 .brand-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--rose-gold),var(--crescent));
@@ -83,7 +86,8 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 /* ── Sign-in screen ── */
 .signin-screen{position:fixed;inset:0;background:var(--bg);z-index:500;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:40px 32px;text-align:center;gap:20px}
+  padding:calc(40px + env(safe-area-inset-top,0px)) 32px calc(40px + env(safe-area-inset-bottom,0px));
+  text-align:center;gap:20px}
 .signin-logo{width:80px;height:80px;background:linear-gradient(135deg,var(--rose-gold),var(--crescent));
   border-radius:24px;display:flex;align-items:center;justify-content:center;
   font-size:38px;box-shadow:0 8px 32px rgba(201,149,107,.4);margin-bottom:8px}
@@ -806,17 +810,19 @@ function fmtDays(n){
 // ════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme();
+
+  // ── Check if returning from Google OAuth redirect ──
+  if(handleOAuthRedirect()) return; // token found in URL hash, launchApp called inside
+
   // Try to restore previous session
   const savedAuth = localStorage.getItem(AUTH_KEY);
   if(savedAuth){
     const auth = JSON.parse(savedAuth);
-    // Check if token is still fresh (< 50 min)
     if(auth.token && auth.expiry && Date.now() < auth.expiry){
       accessToken = auth.token;
       userProfile = auth.profile || null;
       launchApp(true);
     } else {
-      // Token expired — show sign-in but also offer skip
       showSignIn();
     }
   } else {
@@ -832,40 +838,91 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ════════════════════════════════════════════════════════════
-// GOOGLE OAUTH — Token Client (no redirect, popup flow)
+// GOOGLE OAUTH — Smart flow:
+// PWA (standalone) → popup via GSI token client
+// Safari browser  → redirect to Google OAuth URL
 // ════════════════════════════════════════════════════════════
 let tokenClient;
 
+// Detect if running as installed PWA
+const isPWA = window.navigator.standalone === true ||
+              window.matchMedia('(display-mode: standalone)').matches;
+
 function initGoogleAuth(){
-  // google.accounts.oauth2 is loaded via GSI script
   if(!window.google || !window.google.accounts) return;
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: DRIVE_SCOPES + ' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-    callback: handleTokenResponse,
-  });
+  if(isPWA){
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPES + ' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+      callback: handleTokenResponse,
+    });
+  }
 }
 
 function signInWithGoogle(){
-  // GSI script may not be ready yet — wait for it
-  if(!window.google || !window.google.accounts){
-    setTimeout(signInWithGoogle, 500); return;
+  if(isPWA){
+    // Popup flow — works reliably in standalone PWA
+    if(!window.google || !window.google.accounts){
+      setTimeout(signInWithGoogle, 500); return;
+    }
+    if(!tokenClient) initGoogleAuth();
+    tokenClient.requestAccessToken({prompt:'consent'});
+  } else {
+    // Safari browser — use redirect flow to avoid popup blocking
+    // Store a flag so we know to handle the token on return
+    const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+    const scope = encodeURIComponent(DRIVE_SCOPES + ' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email');
+    const state = encodeURIComponent(JSON.stringify({redirect: window.location.href}));
+    const url = `https://accounts.google.com/o/oauth2/v2/auth`
+      + `?client_id=${GOOGLE_CLIENT_ID}`
+      + `&redirect_uri=${redirectUri}`
+      + `&response_type=token`
+      + `&scope=${scope}`
+      + `&state=${state}`
+      + `&include_granted_scopes=true`;
+    window.location.href = url;
   }
-  if(!tokenClient) initGoogleAuth();
-  tokenClient.requestAccessToken({prompt:'consent'});
+}
+
+// Handle redirect return (token in URL hash)
+function handleOAuthRedirect(){
+  const hash = window.location.hash;
+  if(!hash || !hash.includes('access_token')) return false;
+  const params = new URLSearchParams(hash.substring(1));
+  const token = params.get('access_token');
+  const expiresIn = parseInt(params.get('expires_in') || '3600');
+  if(!token) return false;
+  // Clean URL immediately so token isn't visible
+  window.history.replaceState({}, document.title, window.location.pathname);
+  // Process just like popup token
+  accessToken = token;
+  localStorage.setItem(AUTH_KEY, JSON.stringify({
+    token,
+    expiry: Date.now() + (expiresIn - 60) * 1000,
+    profile: null
+  }));
+  // Fetch profile then launch
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
+    headers:{Authorization:'Bearer '+token}
+  }).then(r=>r.json()).then(profile=>{
+    userProfile = profile;
+    const saved = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+    saved.profile = profile;
+    localStorage.setItem(AUTH_KEY, JSON.stringify(saved));
+    launchApp(true);
+  }).catch(()=>launchApp(true));
+  return true;
 }
 
 async function handleTokenResponse(resp){
   if(resp.error){ showToast('Sign-in failed: '+resp.error); return; }
   accessToken = resp.access_token;
-  // Fetch user profile
   try {
     const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
       headers:{Authorization:'Bearer '+accessToken}
     });
     userProfile = await r.json();
   } catch(e){ userProfile = null; }
-  // Save auth with 50-min expiry
   localStorage.setItem(AUTH_KEY, JSON.stringify({
     token: accessToken,
     expiry: Date.now() + 50*60*1000,
@@ -881,9 +938,19 @@ function skipSignIn(){
 function showSignIn(){
   document.getElementById('signinScreen').style.display='flex';
   document.getElementById('app').style.display='none';
-  // Init Google auth once GSI loads
   if(window.google && window.google.accounts) initGoogleAuth();
-  else window.onload = initGoogleAuth;
+  else { // Wait for GSI script to load then init
+    const gsiScript = document.querySelector('script[src*="accounts.google.com"]');
+    if(gsiScript) gsiScript.addEventListener('load', initGoogleAuth);
+  }
+  window.addEventListener('online', onOnline);
+  window.addEventListener('offline', onOffline);
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('/mommy-hub/sw.js').catch(()=>{});
+  // Show which mode we're in
+  const skipBtn = document.querySelector('.signin-skip');
+  if(skipBtn && !isPWA){
+    skipBtn.textContent = 'Continue without sign-in (local only)';
+  }
 }
 
 // ════════════════════════════════════════════════════════════
