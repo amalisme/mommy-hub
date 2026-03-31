@@ -13,7 +13,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -813,17 +812,26 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTheme();
 
   // ── Check if returning from Google OAuth redirect ──
-  if(handleOAuthRedirect()) return; // token found in URL hash, launchApp called inside
+  if(handleOAuthRedirect()) return;
 
   // Try to restore previous session
   const savedAuth = localStorage.getItem(AUTH_KEY);
   if(savedAuth){
     const auth = JSON.parse(savedAuth);
+    userProfile = auth.profile || null;
+    const profileStillValid = auth.profileExpiry && Date.now() < auth.profileExpiry;
     if(auth.token && auth.expiry && Date.now() < auth.expiry){
+      // Token still valid — launch immediately with Drive sync
       accessToken = auth.token;
-      userProfile = auth.profile || null;
       launchApp(true);
+    } else if(profileStillValid){
+      // Token expired but profile known and < 30 days — launch on cache,
+      // silently refresh token in background (no sign-in screen shown)
+      launchApp(false);
+      if(window.google && window.google.accounts) silentTokenRefresh();
+      else setTimeout(silentTokenRefresh, 1500);
     } else {
+      // Profile expired (> 30 days) or no profile — show sign-in
       showSignIn();
     }
   } else {
@@ -858,6 +866,72 @@ function initGoogleAuth(){
       callback: handleTokenResponse,
     });
   }
+}
+
+// ── Silent token refresh — no UI, no popup ──
+// Uses prompt:'none' so Google refreshes silently if user is still signed in.
+// Falls back to showing sign-in only if Google says the session is gone.
+function silentTokenRefresh(){
+  if(!window.google || !window.google.accounts){
+    setTimeout(silentTokenRefresh, 800); return;
+  }
+  if(!tokenClient) initGoogleAuth();
+  if(!tokenClient) return; // not PWA or GSI not ready
+
+  // Override callback temporarily for silent refresh
+  const silentClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: DRIVE_SCOPES + ' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+    callback: (resp) => {
+      if(resp.error === 'interaction_required' || resp.error === 'login_required'){
+        // Google session truly gone — only now show sign-in
+        showSignIn();
+        return;
+      }
+      if(resp.error){ return; } // network error — stay on cached data, try again next open
+      accessToken = resp.access_token;
+      const saved = JSON.parse(localStorage.getItem(AUTH_KEY)||'{}');
+      saved.token = accessToken;
+      saved.expiry = Date.now() + 55*60*1000; // 55 min
+      saved.lastRefresh = Date.now();
+      localStorage.setItem(AUTH_KEY, JSON.stringify(saved));
+      setSyncDot('syncing');
+      driveLoad().then(()=>setSyncDot('synced')).catch(()=>setSyncDot('error'));
+    },
+    prompt: '', // empty string = no prompt at all (silent)
+    hint: userProfile?.email || '',
+  });
+  silentClient.requestAccessToken({prompt:''});
+}
+
+// ── Silent refresh for Safari redirect flow ──
+function silentRedirectRefresh(){
+  // For Safari non-PWA: use a hidden iframe with prompt=none
+  // This works when Google has an active session cookie in Safari
+  const iframeUrl = `https://accounts.google.com/o/oauth2/v2/auth`
+    + `?client_id=${GOOGLE_CLIENT_ID}`
+    + `&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}`
+    + `&response_type=token`
+    + `&scope=${encodeURIComponent(DRIVE_SCOPES + ' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email')}`
+    + `&prompt=none`
+    + `&login_hint=${encodeURIComponent(userProfile?.email||'')}`;
+
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'display:none;width:0;height:0;border:none;position:absolute;';
+  document.body.appendChild(iframe);
+
+  // Listen for postMessage from iframe (Google sends result back)
+  const handler = (e) => {
+    if(!e.origin.includes('google.com')) return;
+    window.removeEventListener('message', handler);
+    iframe.remove();
+  };
+  window.addEventListener('message', handler);
+
+  // Fallback: if iframe silent refresh not possible, just stay on cached data
+  // User will be prompted next time token is needed for Drive
+  setTimeout(() => { iframe.remove(); window.removeEventListener('message', handler); }, 5000);
+  iframe.src = iframeUrl;
 }
 
 function signInWithGoogle(){
@@ -895,11 +969,13 @@ function handleOAuthRedirect(){
   if(!token) return false;
   // Clean URL immediately so token isn't visible
   window.history.replaceState({}, document.title, window.location.pathname);
-  // Process just like popup token
   accessToken = token;
+  // Save with 30-day profile expiry
   localStorage.setItem(AUTH_KEY, JSON.stringify({
     token,
     expiry: Date.now() + (expiresIn - 60) * 1000,
+    profileExpiry: Date.now() + 30*24*60*60*1000,
+    lastRefresh: Date.now(),
     profile: null
   }));
   // Fetch profile then launch
@@ -924,9 +1000,12 @@ async function handleTokenResponse(resp){
     });
     userProfile = await r.json();
   } catch(e){ userProfile = null; }
+  // Store profile for 30 days — token refreshes silently, profile persists
   localStorage.setItem(AUTH_KEY, JSON.stringify({
     token: accessToken,
-    expiry: Date.now() + 50*60*1000,
+    expiry: Date.now() + 55*60*1000,        // access token valid ~55 min
+    profileExpiry: Date.now() + 30*24*60*60*1000, // profile kept 30 days
+    lastRefresh: Date.now(),
     profile: userProfile
   }));
   launchApp(true);
