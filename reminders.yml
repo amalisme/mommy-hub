@@ -1,0 +1,225 @@
+name: Daily Reminder Notifications
+
+on:
+  schedule:
+    # Runs at 8:00 AM Malaysia Time (UTC+8) = 00:00 UTC
+    - cron: '0 0 * * *'
+    # Also run at 6:00 PM MYT (10:00 UTC) for evening reminders
+    - cron: '0 10 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Send daily Telegram reminders
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          node << 'EOF'
+          const https = require('https');
+
+          const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+          const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+          if (!BOT_TOKEN || !CHAT_ID) {
+            console.log('Telegram credentials not set — skipping');
+            process.exit(0);
+          }
+
+          // Malaysia time
+          const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' }));
+          const today = now;
+          const dd = today.getDate();
+          const mm = today.getMonth() + 1; // 1-indexed
+          const yyyy = today.getFullYear();
+          const hour = today.getHours();
+          const isMorning = hour < 12;
+
+          const messages = [];
+
+          // ── Fixed monthly reminders ──
+          const monthlyReminders = [
+            { day: 1,  title: '🏠 Mortgage Plaza KJ',       note: 'Auto deducted today — verify transaction' },
+            { day: 1,  title: '💪 Gym Membership',           note: 'Auto deducted today — verify transaction' },
+            { day: 3,  title: '🏠 Mortgage Mawar',           note: 'Due TOMORROW (before 4th) — pay now if not done!' },
+            { day: 4,  title: '🏠 Mortgage Mawar FINAL',     note: 'Last day to pay Mortgage Mawar!' },
+            { day: 9,  title: '💪 StrengthLog subscription', note: 'Due today (every 3 months) — check TnG' },
+            { day: 10, title: '☁️ iCloud+ subscription',     note: 'Due today — check TnG eWallet' },
+            { day: 20, title: '🤖 Claude Pro',               note: 'Due today — check CIMB Debit' },
+            { day: 21, title: '🎵 Apple Music',              note: 'Due today — check TnG eWallet' },
+            { day: 22, title: '🌐 Unifi Home (Plaza KJ)',    note: 'Bill out around today — check & prepare payment' },
+            { day: 23, title: '⚡ TNB Electricity',          note: 'Bill out today (Plaza KJ + Mawar) — check both accounts' },
+            { day: 24, title: '📱 CelcomDigi Postpaid',      note: 'Bill out today — check & prepare payment' },
+            { day: 25, title: '💳 TnG eWallet top-up',       note: 'Scheduled top-up today' },
+          ];
+
+          // ── Birthdays — immediate family ──
+          const birthdays = [
+            { month: 2,  day: 12, name: 'Thomas',       emoji: '💑' },
+            { month: 3,  day: 8,  name: 'Syabil',        emoji: '👦' },
+            { month: 3,  day: 12, name: 'Lisa',          emoji: '👧' },
+            { month: 5,  day: 2,  name: 'Miki',          emoji: '👦' },
+            // Extended family
+            { month: 2,  day: 2,  name: 'Erwin S',       emoji: '🎂' },
+            { month: 2,  day: 14, name: 'Kak Fizah',     emoji: '🎂' },
+            { month: 2,  day: 19, name: 'Kak Hanan',     emoji: '🎂' },
+            { month: 3,  day: 3,  name: 'Kyah',          emoji: '🎂' },
+            { month: 3,  day: 31, name: 'Chagia',        emoji: '🎂' },
+            { month: 4,  day: 10, name: 'Ika',           emoji: '🎂' },
+            { month: 4,  day: 29, name: 'Abe',           emoji: '🎂' },
+            { month: 5,  day: 18, name: 'Daus Jerry',    emoji: '🎂' },
+            { month: 8,  day: 22, name: 'Wan Mohd Ali',  emoji: '🎂' },
+            { month: 9,  day: 3,  name: 'Adik',          emoji: '🎂' },
+            { month: 11, day: 30, name: 'Eren Y',        emoji: '🎂' },
+          ];
+
+          // ── Gebu remembrance — 30 May every year ──
+          const gebuDaysLeft = daysBetween(today, 5, 30);
+          if (gebuDaysLeft === 0) {
+            messages.push(`🤍 *In Loving Memory of Gebu*\nToday marks the anniversary of Gebu's passing (30 May 2021). Sending you love and light. Al-Fatihah 🕊️`);
+          } else if (gebuDaysLeft === 3) {
+            messages.push(`🤍 *Remembering Gebu — in 3 days*\n30 May is coming. Take a quiet moment to remember 🕊️`);
+          } else if (gebuDaysLeft === 7) {
+            messages.push(`🤍 *Remembering Gebu — in 1 week*\n30 May is approaching. Gebu is always remembered 🕊️`);
+          }
+
+          // ── Public Holidays 2026 ──
+          const holidays = [
+            { month: 1, day: 1,  name: 'New Year\'s Day' },
+            { month: 1, day: 27, name: 'Israk Mikraj' },
+            { month: 1, day: 29, name: 'Chinese New Year' },
+            { month: 2, day: 1,  name: 'Federal Territory Day' },
+            { month: 2, day: 11, name: 'Thaipusam' },
+            { month: 3, day: 30, name: 'Hari Raya Aidilfitri' },
+            { month: 5, day: 1,  name: 'Labour Day' },
+            { month: 5, day: 12, name: 'Wesak Day' },
+            { month: 6, day: 7,  name: 'Hari Raya Haji' },
+            { month: 6, day: 27, name: 'Awal Muharram' },
+            { month: 8, day: 31, name: 'Hari Merdeka' },
+            { month: 9, day: 5,  name: 'Maulidur Rasul' },
+            { month: 9, day: 16, name: 'Malaysia Day' },
+            { month: 10, day: 20, name: 'Deepavali' },
+            { month: 12, day: 25, name: 'Christmas Day' },
+          ];
+
+          function daysBetween(d1, month2, day2) {
+            const d2 = new Date(d1.getFullYear(), month2 - 1, day2);
+            if (d2 < d1) d2.setFullYear(d1.getFullYear() + 1);
+            return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+          }
+
+          // Check monthly reminders (morning only)
+          if (isMorning) {
+            monthlyReminders.forEach(r => {
+              if (r.day === dd) {
+                messages.push(`📌 *${r.title}*\n${r.note}`);
+              }
+            });
+          }
+
+          // Check birthdays — 7 days before, 3 days before, and on the day
+          birthdays.forEach(b => {
+            const daysLeft = daysBetween(today, b.month, b.day);
+            if (daysLeft === 0) {
+              messages.push(`🎂 *Happy Birthday ${b.name}!* ${b.emoji}\nToday is ${b.name}'s birthday — don't forget to celebrate! 🎉`);
+            } else if (daysLeft === 3) {
+              messages.push(`🎂 *${b.name}'s Birthday in 3 days!* ${b.emoji}\nTime to buy a cake or plan something special 🎁`);
+            } else if (daysLeft === 7) {
+              messages.push(`🎂 *${b.name}'s Birthday in 1 week!* ${b.emoji}\nStart planning — what does ${b.name} love? 💖`);
+            }
+          });
+
+          // Check public holidays — 7 days and 3 days before
+          holidays.forEach(h => {
+            const daysLeft = daysBetween(today, h.month, h.day);
+            if (daysLeft === 7) {
+              messages.push(`🇲🇾 *${h.name} is in 7 days!*\nTime to prepare — groceries, travel plans, family arrangements? 🌙`);
+            } else if (daysLeft === 3) {
+              messages.push(`🇲🇾 *${h.name} is in 3 days!*\nFinal check — have you sorted everything? 🌸`);
+            } else if (daysLeft === 0) {
+              messages.push(`🇲🇾 *${h.name} today!*\nWishing you a wonderful ${h.name} 🌸`);
+            }
+          });
+
+          // Monthly SNOW KB reminder — remind on 20th and 27th
+          if (isMorning && (dd === 20 || dd === 27)) {
+            messages.push(`💻 *SNOW Knowledge Base Contribution*\nMonthly KPI reminder — have you submitted your KB article this month? Due end of month!`);
+          }
+
+          // Assessment Tax — 1st March
+          if (mm === 3 && dd === 1 && isMorning) {
+            messages.push(`🏛️ *Assessment Tax Due Today*\n1st March — annual assessment tax payment due!`);
+          }
+
+          // TnG Clue subscription — 20 January
+          if (mm === 1 && dd === 19 && isMorning) {
+            messages.push(`📱 *Clue App subscription tomorrow*\n20 January — yearly Clue subscription via TnG tomorrow`);
+          }
+
+          // TnG Cryptomator — 15 November
+          if (mm === 11 && dd === 14 && isMorning) {
+            messages.push(`🔐 *Cryptomator subscription tomorrow*\n15 November — yearly Cryptomator subscription via TnG tomorrow`);
+          }
+
+          if (messages.length === 0) {
+            console.log('No reminders for today — nothing to send');
+            process.exit(0);
+          }
+
+          // Build Telegram message
+          const greeting = isMorning
+            ? `🌅 *Good morning, Mommy!* Here's your ${dd}/${mm} briefing:\n\n`
+            : `🌙 *Evening check-in, Mommy!* Reminders for today:\n\n`;
+
+          const fullMessage = greeting + messages.join('\n\n') + '\n\n_— Mommy Reminder Hub 🌸_';
+
+          // Send to Telegram
+          const payload = JSON.stringify({
+            chat_id: CHAT_ID,
+            text: fullMessage,
+            parse_mode: 'Markdown',
+            disable_web_page_preview: true
+          });
+
+          const options = {
+            hostname: 'api.telegram.org',
+            path: `/bot${BOT_TOKEN}/sendMessage`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload)
+            }
+          };
+
+          const req = https.request(options, res => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+              const result = JSON.parse(data);
+              if (result.ok) {
+                console.log(`✅ Sent ${messages.length} reminder(s) to Telegram`);
+              } else {
+                console.error('❌ Telegram error:', result.description);
+                process.exit(1);
+              }
+            });
+          });
+
+          req.on('error', err => {
+            console.error('❌ Request error:', err);
+            process.exit(1);
+          });
+
+          req.write(payload);
+          req.end();
+          EOF
