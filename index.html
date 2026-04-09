@@ -626,6 +626,45 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
           <div class="reminder-card" style="margin:0;border-radius:var(--radius-sm);"><div class="check-circle checked" style="margin-top:7px;">✓</div><div class="cat-dot" style="background:#e87cb822;color:#e87cb8;font-size:20px;">🎂</div><div class="reminder-body"><div class="reminder-title">Syabil's Birthday — 8 March</div><div class="reminder-sub">Passed this year 🎉</div></div><div class="reminder-badge badge-done">Passed</div></div>
         </div>
       </div>
+
+      <!-- Extended Family -->
+      <div class="section-head" style="padding-top:6px;">
+        <div class="section-title">👨‍👩‍👧‍👦 Extended Family</div>
+      </div>
+      <div style="padding:0 16px;">
+
+        <!-- Gebu remembrance — special card -->
+        <div class="kid-card" style="border:1.5px solid var(--crescent);">
+          <div class="kid-header" style="margin-bottom:6px;">
+            <div class="kid-avatar" style="background:linear-gradient(135deg,#4a4a6a,#7a7a9a);">🤍</div>
+            <div>
+              <div class="kid-name" style="font-size:16px;">In Loving Memory of Gebu</div>
+              <div class="kid-age">30 May 2021 • Remembered every year 🤍</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);font-style:italic;padding:4px 0 2px;">
+            A quiet reminder every 30 May to pause and remember 🕊️
+          </div>
+        </div>
+
+        <!-- Extended family birthday list -->
+        <div class="kid-card">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Birthdays — Extended Family</div>
+
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Erwin S</div><div class="vax-date">2 February</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Kak Fizah</div><div class="vax-date">14 February</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Kak Hanan</div><div class="vax-date">19 February</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Kyah</div><div class="vax-date">3 March</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Chagia</div><div class="vax-date">31 March</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Ika</div><div class="vax-date">10 April</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Abe</div><div class="vax-date">29 April</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Daus Jerry</div><div class="vax-date">18 May</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Wan Mohd Ali</div><div class="vax-date">22 August</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Adik</div><div class="vax-date">3 September</div></div>
+          <div class="vax-item"><div class="vax-check">🎂</div><div class="vax-name">Eren Y</div><div class="vax-date">30 November</div></div>
+        </div>
+
+      </div>
       <div class="section-head" style="padding-top:6px;"><div class="section-title">🍽️ This Week's Meals</div><span class="section-link">Edit</span></div>
       <div style="padding:0 16px 8px;">
         <div class="meal-day"><div class="meal-day-head"><div class="meal-day-name">Tuesday</div><div class="meal-day-date">24 Mar</div></div><div class="meal-slot"><div class="meal-slot-label">Lunch</div><div class="meal-slot-value">Nasi goreng kampung + telur mata</div></div><div class="meal-slot"><div class="meal-slot-label">Dinner</div><div class="meal-slot-value">Sup tulang + nasi putih</div></div></div>
@@ -1043,6 +1082,9 @@ async function launchApp(withDrive){
   // Load local cache first for instant render
   reminders = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
 
+  // Seed family birthdays on first run (runs once, never duplicates)
+  seedBirthdaysIfNeeded();
+
   applyTheme();
   setTodayHeader();
   updateFinanceStatuses();
@@ -1162,6 +1204,72 @@ function persistReminders(){
   localStorage.setItem(STORE_KEY, JSON.stringify(reminders));
   setSyncDot('syncing');
   driveSave();
+}
+
+// ════════════════════════════════════════════════════════════
+// SEED BIRTHDAYS — runs once on first launch
+// Adds all family birthdays + Gebu remembrance as yearly reminders.
+// Uses a flag so it never duplicates on subsequent opens.
+// ════════════════════════════════════════════════════════════
+const SEED_KEY = 'mrh_seeded_birthdays_v1';
+
+function seedBirthdaysIfNeeded(){
+  if(localStorage.getItem(SEED_KEY)) return; // already seeded
+
+  const year = new Date().getFullYear();
+
+  const births = [
+    // Immediate family
+    { title:"Thomas's Birthday 💑",      month:2,  day:12, notes:'Arrange dinner or buy cake 🎂' },
+    { title:"Syabil's Birthday 🎉",       month:3,  day:8,  notes:'Plan something special!' },
+    { title:"Lisa's Birthday 🎂",         month:3,  day:12, notes:"Turning 5! Plan her party 🎠" },
+    { title:"Miki's Birthday 🎈",         month:5,  day:2,  notes:'Plan something fun!' },
+    // Extended family
+    { title:"Erwin S's Birthday 🎂",      month:2,  day:2  },
+    { title:"Kak Fizah's Birthday 🎂",    month:2,  day:14 },
+    { title:"Kak Hanan's Birthday 🎂",    month:2,  day:19 },
+    { title:"Kyah's Birthday 🎂",         month:3,  day:3  },
+    { title:"Chagia's Birthday 🎂",       month:3,  day:31 },
+    { title:"Ika's Birthday 🎂",          month:4,  day:10 },
+    { title:"Abe's Birthday 🎂",          month:4,  day:29 },
+    { title:"Daus Jerry's Birthday 🎂",   month:5,  day:18 },
+    { title:"Wan Mohd Ali's Birthday 🎂", month:8,  day:22 },
+    { title:"Adik's Birthday 🎂",         month:9,  day:3  },
+    { title:"Eren Y's Birthday 🎂",       month:11, day:30 },
+  ];
+
+  births.forEach(b => {
+    const due = `${year}-${String(b.month).padStart(2,'0')}-${String(b.day).padStart(2,'0')}T08:00`;
+    reminders.push({
+      id: 'seed_bday_' + b.month + '_' + b.day,
+      title: b.title,
+      category: 'birthday',
+      priority: 'normal',
+      due,
+      repeat: 'yearly',
+      notes: b.notes || '',
+      done: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  });
+
+  // Gebu remembrance — special category, yearly on 30 May
+  reminders.push({
+    id: 'seed_gebu_remembrance',
+    title: 'In Loving Memory of Gebu 🤍',
+    category: 'selfcare',
+    priority: 'normal',
+    due: `${year}-05-30T08:00`,
+    repeat: 'yearly',
+    notes: 'Gebu passed away 30 May 2021. A quiet moment to remember and pray 🕊️',
+    done: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
+  localStorage.setItem(SEED_KEY, '1');
+  persistReminders();
 }
 
 async function manualSync(){
