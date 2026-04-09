@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -63,13 +63,35 @@ jobs:
             { day: 25, title: '💳 TnG eWallet top-up',       note: 'Scheduled top-up today' },
           ];
 
-          // ── Birthdays ──
+          // ── Birthdays — immediate family ──
           const birthdays = [
-            { month: 2, day: 12, name: 'Thomas', emoji: '💑' },
-            { month: 3, day: 8,  name: 'Syabil', emoji: '👦' },
-            { month: 3, day: 12, name: 'Lisa',   emoji: '👧' },
-            { month: 5, day: 2,  name: 'Miki',   emoji: '👦' },
+            { month: 2,  day: 12, name: 'Thomas',       emoji: '💑' },
+            { month: 3,  day: 8,  name: 'Syabil',        emoji: '👦' },
+            { month: 3,  day: 12, name: 'Lisa',          emoji: '👧' },
+            { month: 5,  day: 2,  name: 'Miki',          emoji: '👦' },
+            // Extended family
+            { month: 2,  day: 2,  name: 'Erwin S',       emoji: '🎂' },
+            { month: 2,  day: 14, name: 'Kak Fizah',     emoji: '🎂' },
+            { month: 2,  day: 19, name: 'Kak Hanan',     emoji: '🎂' },
+            { month: 3,  day: 3,  name: 'Kyah',          emoji: '🎂' },
+            { month: 3,  day: 31, name: 'Chagia',        emoji: '🎂' },
+            { month: 4,  day: 10, name: 'Ika',           emoji: '🎂' },
+            { month: 4,  day: 29, name: 'Abe',           emoji: '🎂' },
+            { month: 5,  day: 18, name: 'Daus Jerry',    emoji: '🎂' },
+            { month: 8,  day: 22, name: 'Wan Mohd Ali',  emoji: '🎂' },
+            { month: 9,  day: 3,  name: 'Adik',          emoji: '🎂' },
+            { month: 11, day: 30, name: 'Eren Y',        emoji: '🎂' },
           ];
+
+          // ── Gebu remembrance — 30 May every year ──
+          const gebuDaysLeft = daysBetween(today, 5, 30);
+          if (gebuDaysLeft === 0) {
+            messages.push(`🤍 *In Loving Memory of Gebu*\nToday marks the anniversary of Gebu's passing (30 May 2021). Sending you love and light. Al-Fatihah 🕊️`);
+          } else if (gebuDaysLeft === 3) {
+            messages.push(`🤍 *Remembering Gebu — in 3 days*\n30 May is coming. Take a quiet moment to remember 🕊️`);
+          } else if (gebuDaysLeft === 7) {
+            messages.push(`🤍 *Remembering Gebu — in 1 week*\n30 May is approaching. Gebu is always remembered 🕊️`);
+          }
 
           // ── Public Holidays 2026 ──
           const holidays = [
